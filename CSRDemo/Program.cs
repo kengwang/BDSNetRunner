@@ -141,6 +141,9 @@ namespace CSRDemo
 					} else if (fe.selected == "5")
                     {
 						pl.addLevel(3);
+                    }else if(fe.selected == "6")
+                    {
+						pl.teleport(100, 100, 100);
                     }
 				}
                 else{
@@ -420,7 +423,7 @@ namespace CSRDemo
 											   "测试选项",
 											   "test choose:",
 											   "[\"基本组件\",\"物品栏组件\",\"组件设置\", \"范围检测并清理\",\"范围检测并攻击\"," +
-											   "\"玩家等级+3\" ]");
+											   "\"玩家等级+3\",\"测试传送\" ]");
 						Console.WriteLine("创建需自行保管的表单，id={0}", tformid);
 						// 非社区内容测试
 						if (api.COMMERCIAL)

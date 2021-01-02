@@ -22,7 +22,7 @@ struct BPos3 {
 struct BlockLegacy {
 	// 获取方块名
 	auto getFullName() const {				// IDA BlockLegacy::~BlockLegacy
-		return (std::string&) * (__int64*)((__int64)this + 120);
+		return (std::string&)*(__int64*)((__int64)this + 120);
 	}
 	// 获取方块ID号
 	auto getBlockItemID() const {			// IDA BlockLegacy::BlockLegacy VanillaItems::serverInitCreativeItemsCallback Item::beginCreativeGroup "itemGroup.name.planks"
@@ -91,7 +91,7 @@ struct BlockSource {
 		return *(int*)(*((VA*)this + 4) + 200);
 	}
 	// 获取指定范围内所有实体
-	std::vector<VA*>* getEntities(VA *rect) {
+	std::vector<VA*>* getEntities(VA* rect) {
 		return SYMCALL(std::vector<VA*>*, MSSYM_MD5_73d55bcf0da8c45a15024daf84014ad7,
 			this, 0, rect, 1);
 	}
@@ -167,7 +167,7 @@ struct AABB {
 			max.x == 0.0 && max.y == 0.0 && max.z == 0.0);
 	}
 	// 从两点间获取一个区域
-	bool fromPoints(Vec3 *a, Vec3 *b) {
+	bool fromPoints(Vec3* a, Vec3* b) {
 		if (!a || !b)
 			return false;
 		min.x = std::min<float>(a->x, b->x);
@@ -204,7 +204,7 @@ struct Actor {
 	// equipment，装备掉率列表，复杂类型，略
 	// equippable，允许装备内容列表，复杂类型，略
 	// explode，爆炸力，复杂类型，略
-	
+
 	// 导出API，获取主副手装备，只读
 	static std::string sgetHandContainer(Actor*);
 	// healable，补品列表，复杂类型，略
@@ -220,7 +220,7 @@ struct Actor {
 	static std::string sgetInventoryContainer(Actor*);
 	// lookat，敌对关注，复杂类型，略
 	// nameable，自定义名称相关属性，复杂类型，略
-	
+
 	// 导出API，获取名称信息
 	static std::string sgetName(Actor*);
 	// 导出API，设置名称信息，是否一直显示
@@ -237,7 +237,7 @@ struct Actor {
 	// spawn_entity，定义实体诞生其它新实体的属性（如鸡等），复杂类型，略
 	// teleport，定义实体自随机传送属性（如末影人等），复杂类型，略
 	// tick_world，实体可用更新域、于世界的刷新行为等，复杂类型，略
-	
+
 	// 导出API，获取维度ID，只读
 	static int sgetDimensionId(Actor*);
 	// 导出API，获取实体类型ID，只读
@@ -313,11 +313,16 @@ struct Actor {
 		return en_name;
 	}
 
-	// 骑乘
-	void AddRider(Actor* actor) {
-		SYMCALL(void,
-			MSSYM_B1QA8addRiderB1AA5ActorB2AAE10UEAAXAEAV1B2AAA1Z,
-			this, actor);
+	// 骑乘 - TODO - by kengwang
+	//void AddRider(Actor* actor) {
+	//	SYMCALL(void,
+	//		MSSYM_B1QA8addRiderB1AA5ActorB2AAE10UEAAXAEAV1B2AAA1Z,
+	//		this, actor);
+	//}
+
+	void teleportTo(Vec3* vec3) {
+		SYMCALL(void, MSSYM_B1QE10teleportToB1AA5ActorB2AAE13UEAAXAEBVVec3B3AAUE20NHHAEBUActorUniqueIDB3AAAA1Z,
+			this, vec3, 0);
 	}
 };
 
@@ -347,6 +352,8 @@ struct Player : Mob {
 	static void saddLevel(Player*, int);
 	// 导出API，查询指定维度指定坐标范围内所有玩家
 	static std::vector<VA*>* sgetPlayers(int, float, float, float, float, float, float);
+	// 导出API，传送玩家
+	static void steleport(Player*, float,float,float);
 #pragma endregion
 
 	// 取uuid

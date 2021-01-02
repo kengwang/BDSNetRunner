@@ -886,7 +886,7 @@ std::string Actor::sgetHandContainer(Actor* e) {
 		(ItemStack*)(*(VA(__fastcall**)(VA, VA))(**(VA**)phand + 152))(
 			*(VA*)phand, (VA)&hands);
 		if (Actor::sgetEntityTypeId(e) == 319) {
-			ItemStack* v6 = (*(ItemStack *(__fastcall**)(Actor*))(*(VA*)e + 1216))(e);
+			ItemStack* v6 = (*(ItemStack * (__fastcall**)(Actor*))(*(VA*)e + 1216))(e);
 			hands[0] = v6;
 		}
 		for (VA i = 0, l = hands.size(); i < l; i++) {
@@ -980,7 +980,8 @@ bool Actor::ssetName(Actor* e, const char* n, bool alwaysShow) {
 	std::string nname = GBKToUTF8(n);
 	if (Actor::sgetEntityTypeId(e) == 319) {
 		((Player*)e)->reName(nname);
-	} else
+	}
+	else
 		SYMCALL(VA, MSSYM_MD5_2f9772d3549cbbfca05bc883e3dd5c30, e, nname);
 	bool v = alwaysShow;					// IDA SynchedActorData::set<signed char>
 	SYMCALL(VA, MSSYM_B3QQDA3setB1AA1CB1AE16SynchedActorDataB2AAE10QEAAXGAEBCB1AA1Z, (VA)e + 352, ActorDataIDs::NAMETAG_ALWAYS_SHOW, &v);
@@ -1132,7 +1133,7 @@ std::string Player::sgetUuid(Player* p) {
 
 std::string Player::sgetIPPort(Player* p) {
 	char v11[256];
-	char v12[256]{0};
+	char v12[256]{ 0 };
 	VA v4 = *(VA*)(*(VA*)(*(VA*)(p_ServerNetworkHandle + 64) + 32) + 440);
 	auto v5 = GetModuleHandleW(0);
 	((void(*)(VA))(v5 + 1433268))((VA)v11);
@@ -1143,6 +1144,17 @@ std::string Player::sgetIPPort(Player* p) {
 
 void Player::saddLevel(Player* p, int lv) {
 	SYMCALL(void, MSSYM_B1QA9addLevelsB1AA6PlayerB2AAA6UEAAXHB1AA1Z, p, lv);
+}
+
+
+void Player::steleport(Player* p, float x, float y, float z) {
+	Vec3 vec3;
+	memcpy(&vec3, 0, sizeof(Vec3));
+	vec3.x = x;
+	vec3.y = y;
+	vec3.z = z;
+	SYMCALL(void, MSSYM_B1QE10teleportToB1AA6PlayerB2AAE13UEAAXAEBVVec3B3AAUE20NHHAEBUActorUniqueIDB3AAAA1Z,
+		p, &vec3, true, 0, 0);
 }
 
 std::vector<VA*>* Player::sgetPlayers(int did, float x1, float y1, float z1, float x2, float y2, float z2) {
@@ -1190,6 +1202,7 @@ public:
 		mcMethods[m.PLAYER_GET_UUID] = &Player::sgetUuid;
 		mcMethods[m.PLAYER_GET_IPPORT] = &Player::sgetIPPort;
 		mcMethods[m.PLAYER_ADD_LEVEL] = &Player::saddLevel;
+		mcMethods[m.PLAYER_TELEPORT] = &Player::steleport;
 	}
 	void* getMcMethod(std::string methodname) {
 		return mcMethods[methodname];
@@ -1282,7 +1295,7 @@ static bool _CS_ONSERVERCMD(VA _this, std::string* cmd) {
 	se.releaseAll();
 	return ret;
 }
-static VA ONSERVERCMD_SYMS[] = {1, MSSYM_MD5_b5c9e566146b3136e6fb37f0c080d91e, (VA)_CS_ONSERVERCMD };
+static VA ONSERVERCMD_SYMS[] = { 1, MSSYM_MD5_b5c9e566146b3136e6fb37f0c080d91e, (VA)_CS_ONSERVERCMD };
 
 
 // 服务器后台指令输出
@@ -1310,7 +1323,7 @@ static VA _CS_ONSERVERCMDOUTPUT(VA handle, char* str, VA size) {
 	}
 	return original(handle, str, size);
 }
-static VA ONSERVERCMDOUTPUT_SYMS[] = {1, MSSYM_MD5_b5f2f0a753fc527db19ac8199ae8f740, (VA)_CS_ONSERVERCMDOUTPUT};
+static VA ONSERVERCMDOUTPUT_SYMS[] = { 1, MSSYM_MD5_b5f2f0a753fc527db19ac8199ae8f740, (VA)_CS_ONSERVERCMDOUTPUT };
 
 
 // 玩家选择表单
@@ -1346,7 +1359,7 @@ static void _CS_ONFORMSELECT(VA _this, VA id, VA handle, ModalFormResponsePacket
 	}
 	original(_this, id, handle, fp);
 }
-static VA ONFORMSELECT_SYMS[] = {1, MSSYM_MD5_8b7f7560f9f8353e6e9b16449ca999d2, (VA)_CS_ONFORMSELECT};
+static VA ONFORMSELECT_SYMS[] = { 1, MSSYM_MD5_8b7f7560f9f8353e6e9b16449ca999d2, (VA)_CS_ONFORMSELECT };
 
 // 玩家操作物品
 static bool _CS_ONUSEITEM(void* _this, ItemStack* item, BlockPos* pBlkpos, unsigned __int8 a4, void* v5, Block* pBlk) {
@@ -1378,8 +1391,8 @@ static bool _CS_ONUSEITEM(void* _this, ItemStack* item, BlockPos* pBlkpos, unsig
 	ue.releaseAll();
 	return ret;
 }
-static VA ONUSEITEM_SYMS[] = {1, MSSYM_B1QA9useItemOnB1AA8GameModeB2AAA4UEAAB1UE14NAEAVItemStackB2AAE12AEBVBlockPosB2AAA9EAEBVVec3B2AAA9PEBVBlockB3AAAA1Z,
-	(VA)_CS_ONUSEITEM};
+static VA ONUSEITEM_SYMS[] = { 1, MSSYM_B1QA9useItemOnB1AA8GameModeB2AAA4UEAAB1UE14NAEAVItemStackB2AAE12AEBVBlockPosB2AAA9EAEBVVec3B2AAA9PEBVBlockB3AAAA1Z,
+	(VA)_CS_ONUSEITEM };
 
 // 玩家放置方块
 static bool _CS_ONPLACEDBLOCK(BlockSource* _this, Block* pBlk, BlockPos* pBlkpos, unsigned __int8 a4, struct Actor* pPlayer, bool _bool) {
@@ -1410,7 +1423,7 @@ static bool _CS_ONPLACEDBLOCK(BlockSource* _this, Block* pBlk, BlockPos* pBlkpos
 	return original(_this, pBlk, pBlkpos, a4, pPlayer, _bool);
 }
 static VA ONPLACEDBLOCK_SYMS[] = { 1, MSSYM_B1QA8mayPlaceB1AE11BlockSourceB2AAA4QEAAB1UE10NAEBVBlockB2AAE12AEBVBlockPosB2AAE10EPEAVActorB3AAUA1NB1AA1Z ,
-(VA)_CS_ONPLACEDBLOCK};
+(VA)_CS_ONPLACEDBLOCK };
 
 // 玩家破坏方块
 static bool _CS_ONDESTROYBLOCK(void* _this, BlockPos* pBlkpos) {
@@ -1439,8 +1452,8 @@ static bool _CS_ONDESTROYBLOCK(void* _this, BlockPos* pBlkpos) {
 	de.releaseAll();
 	return ret;
 }
-static VA ONDESTROYBLOCK_SYMS[] = {1, MSSYM_B2QUE20destroyBlockInternalB1AA8GameModeB2AAA4AEAAB1UE13NAEBVBlockPosB2AAA1EB1AA1Z,
-	(VA)_CS_ONDESTROYBLOCK};
+static VA ONDESTROYBLOCK_SYMS[] = { 1, MSSYM_B2QUE20destroyBlockInternalB1AA8GameModeB2AAA4AEAAB1UE13NAEBVBlockPosB2AAA1EB1AA1Z,
+	(VA)_CS_ONDESTROYBLOCK };
 
 // 玩家开箱准备
 static bool _CS_ONCHESTBLOCKUSE(void* _this, Player* pPlayer, BlockPos* pBlkpos) {
@@ -1497,8 +1510,8 @@ static bool _CS_ONBARRELBLOCKUSE(void* _this, Player* pPlayer, BlockPos* pBlkpos
 	de.releaseAll();
 	return ret;
 }
-static VA ONSTARTOPENBARREL_SYMS[] = {1, MSSYM_B1QA3useB1AE11BarrelBlockB2AAA4UEBAB1UE11NAEAVPlayerB2AAE12AEBVBlockPosB2AAA1EB1AA1Z,
-	(VA)_CS_ONBARRELBLOCKUSE};
+static VA ONSTARTOPENBARREL_SYMS[] = { 1, MSSYM_B1QA3useB1AE11BarrelBlockB2AAA4UEBAB1UE11NAEAVPlayerB2AAE12AEBVBlockPosB2AAA1EB1AA1Z,
+	(VA)_CS_ONBARRELBLOCKUSE };
 
 // 玩家关闭箱子
 static void _CS_ONSTOPOPENCHEST(void* _this, Player* pPlayer) {
@@ -1525,8 +1538,8 @@ static void _CS_ONSTOPOPENCHEST(void* _this, Player* pPlayer) {
 	runCscode(ActEvent.ONSTOPOPENCHEST, ActMode::AFTER, e);
 	de.releaseAll();
 }
-static VA ONSTOPOPENCHEST_SYMS[] = {1, MSSYM_B1QA8stopOpenB1AE15ChestBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
-	(VA)_CS_ONSTOPOPENCHEST};
+static VA ONSTOPOPENCHEST_SYMS[] = { 1, MSSYM_B1QA8stopOpenB1AE15ChestBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
+	(VA)_CS_ONSTOPOPENCHEST };
 
 // 玩家关闭木桶
 static void _CS_STOPOPENBARREL(void* _this, Player* pPlayer) {
@@ -1553,8 +1566,8 @@ static void _CS_STOPOPENBARREL(void* _this, Player* pPlayer) {
 	runCscode(ActEvent.ONSTOPOPENBARREL, ActMode::AFTER, e);
 	de.releaseAll();
 }
-static VA ONSTOPOPENBARREL_SYMS[] = {1, MSSYM_B1QA8stopOpenB1AE16BarrelBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
-	(VA)_CS_STOPOPENBARREL};
+static VA ONSTOPOPENBARREL_SYMS[] = { 1, MSSYM_B1QA8stopOpenB1AE16BarrelBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
+	(VA)_CS_STOPOPENBARREL };
 
 // 玩家放入取出数量
 static void _CS_ONSETSLOT(LevelContainerModel* a1, VA a2) {
@@ -1605,8 +1618,8 @@ static void _CS_ONSETSLOT(LevelContainerModel* a1, VA a2) {
 	else
 		original(a1, a2);
 }
-static VA ONSETSLOT_SYMS[] = {1, MSSYM_B1QE23containerContentChangedB1AE19LevelContainerModelB2AAA6UEAAXHB1AA1Z,
-	(VA)_CS_ONSETSLOT};
+static VA ONSETSLOT_SYMS[] = { 1, MSSYM_B1QE23containerContentChangedB1AE19LevelContainerModelB2AAA6UEAAXHB1AA1Z,
+	(VA)_CS_ONSETSLOT };
 
 // 玩家切换维度
 static bool _CS_ONCHANGEDIMENSION(void* _this, Player* pPlayer, void* req) {
@@ -1633,8 +1646,8 @@ static bool _CS_ONCHANGEDIMENSION(void* _this, Player* pPlayer, void* req) {
 	de.releaseAll();
 	return ret;
 }
-static VA ONCHANGEDIMENSION_SYMS[] = {1, MSSYM_B2QUE21playerChangeDimensionB1AA5LevelB2AAA4AEAAB1UE11NPEAVPlayerB2AAE26AEAVChangeDimensionRequestB3AAAA1Z ,
-	(VA)_CS_ONCHANGEDIMENSION};
+static VA ONCHANGEDIMENSION_SYMS[] = { 1, MSSYM_B2QUE21playerChangeDimensionB1AA5LevelB2AAA4AEAAB1UE11NPEAVPlayerB2AAE26AEAVChangeDimensionRequestB3AAAA1Z ,
+	(VA)_CS_ONCHANGEDIMENSION };
 
 // 生物死亡
 static void _CS_ONMOBDIE(Mob* _this, void* dmsg) {
@@ -1648,7 +1661,7 @@ static void _CS_ONMOBDIE(Mob* _this, void* dmsg) {
 	e.data = &de;
 	bool ret = runCscode(ActEvent.ONMOBDIE, ActMode::BEFORE, e);
 	if (ret) {
-		auto original = (void(*)(Mob*, void*))*getOriginalData(_CS_ONMOBDIE);
+		auto original = (void(*)(Mob*, void*)) * getOriginalData(_CS_ONMOBDIE);
 		original(_this, dmsg);
 		e.result = ret;
 		e.mode = ActMode::AFTER;
@@ -1703,7 +1716,7 @@ static void _CS_ONCHAT(void* _this, std::string& player_name, std::string& targe
 	}
 	de.releaseAll();
 }
-static VA ONCHAT_SYMS[] = {1, MSSYM_MD5_ad251f2fd8c27eb22c0c01209e8df83c, (VA)_CS_ONCHAT };
+static VA ONCHAT_SYMS[] = { 1, MSSYM_MD5_ad251f2fd8c27eb22c0c01209e8df83c, (VA)_CS_ONCHAT };
 
 // 输入文本
 static void _CS_ONINPUTTEXT(VA _this, VA id, TextPacket* tp) {
@@ -1885,8 +1898,8 @@ static VA _CS_ONMOVE(void* _this, Player* pPlayer, char v3, int v4, int v5) {
 	de.releaseAll();
 	return reto;
 }
-static VA ONMOVE_SYMS[] = {1, MSSYM_B2QQE170MovePlayerPacketB2AAA4QEAAB1AE10AEAVPlayerB2AAE14W4PositionModeB1AA11B1AA2HHB1AA1Z,
-	(VA)_CS_ONMOVE};
+static VA ONMOVE_SYMS[] = { 1, MSSYM_B2QQE170MovePlayerPacketB2AAA4QEAAB1AE10AEAVPlayerB2AAE14W4PositionModeB1AA11B1AA2HHB1AA1Z,
+	(VA)_CS_ONMOVE };
 
 // 玩家攻击监听
 static bool _CS_ONATTACK(Player* pPlayer, Actor* pa) {
@@ -1913,8 +1926,8 @@ static bool _CS_ONATTACK(Player* pPlayer, Actor* pa) {
 	de.releaseAll();
 	return ret;
 }
-static VA ONATTACK_SYMS[] = {1, MSSYM_B1QA6attackB1AA6PlayerB2AAA4UEAAB1UE10NAEAVActorB3AAAA1Z,
-	(VA)_CS_ONATTACK};
+static VA ONATTACK_SYMS[] = { 1, MSSYM_B1QA6attackB1AA6PlayerB2AAA4UEAAB1UE10NAEAVActorB3AAAA1Z,
+	(VA)_CS_ONATTACK };
 
 // 全图范围爆炸监听
 static void _CS_ONLEVELEXPLODE(VA _this, BlockSource* a2, Actor* a3, Vec3* a4, float a5, bool a6, bool a7, float a8, bool a9) {
@@ -2277,7 +2290,7 @@ static VA ONPICKUPITEM_SYMS[] = { 1, MSSYM_B1QA4takeB1AA6PlayerB2AAA4QEAAB1UE10N
 #endif
 
 // 初始化各类hook的事件绑定，基于构造函数
-static struct EventSymsInit{
+static struct EventSymsInit {
 public:
 	EventSymsInit() {
 		sListens[ActEvent.ONSERVERCMD] = ONSERVERCMD_SYMS;

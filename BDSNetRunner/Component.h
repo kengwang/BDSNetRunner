@@ -320,4 +320,5 @@ struct MCMETHOD {
 	const std::string PLAYER_GET_UUID = "player.get_uuid";
 	const std::string PLAYER_GET_IPPORT = "player.get_ipport";
 	const std::string PLAYER_ADD_LEVEL = "player.add_level";
+	const std::string PLAYER_TELEPORT = "player.teleport";
 };
