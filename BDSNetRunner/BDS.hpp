@@ -353,7 +353,7 @@ struct Player : Mob {
 	// 导出API，查询指定维度指定坐标范围内所有玩家
 	static std::vector<VA*>* sgetPlayers(int, float, float, float, float, float, float);
 	// 导出API，传送玩家
-	static void steleport(Player*, float,float,float);
+	static void steleport(Player*, float, float, float);
 #pragma endregion
 
 	// 取uuid

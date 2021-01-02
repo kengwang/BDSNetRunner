@@ -364,6 +364,7 @@ bool setServerMotd(const char* motd, bool isShow) {
 	}
 	return false;
 }
+
 #endif
 
 // 函数名：reNameByUuid
@@ -583,6 +584,48 @@ bool sendText(const char* uuid, const char* txt) {
 			safeTick(fr);
 			return true;
 		}
+	}
+	return false;
+}
+
+// 函数名：setSideBar
+// 功能：设置玩家的侧边栏
+// 参数个数：2个
+// 参数类型：字符串，字符串
+// 参数详解：uuid - 在线玩家的uuid字符串，txt - 侧边栏
+// 返回值：是否发送成功
+bool setSideBar(const char* uuid, const char* txt) {
+	Player* p = onlinePlayers[uuid];
+	if (playerSign[p]) {
+		std::string suuid = uuid;
+		std::string stxt = "";
+		auto s = GBKToUTF8(txt);
+		if (s.length())
+			stxt = s;
+		auto fr = [suuid, stxt]() {
+			Player* p = onlinePlayers[suuid];
+			if (playerSign[p]) {
+				VA a1;
+				SYMCALL(VA, MSSYM_B1QE12createPacketB1AE16MinecraftPacketsB2AAA2SAB1QA2AVB2QDA6sharedB1UA3ptrB1AA7VPacketB3AAAA3stdB2AAE20W4MinecraftPacketIdsB3AAAA1Z,
+					&a1, 0x6b);
+				*(DWORD*)(a1 + 8) = 2;
+				*(DWORD*)(a1 + 12) = 1;
+				*(WORD*)(a1 + 16) = 0;
+				*(int*)(a1 + 24) = 0i64;
+				*(DWORD*)(a1 + 32) = 0;
+				SYMCALL(VA, MSSYM_B1QE12createPacketB1AE16MinecraftPacketsB2AAA2SAB1QA2AVB2QDA6sharedB1UA3ptrB1AA7VPacketB3AAAA3stdB2AAE20W4MinecraftPacketIdsB3AAAA1Z,
+					&a1, 0x6b);
+				std::cout << stxt << std::endl;
+				*(std::string*)(a1 + 40) = "sidebar";
+				*(std::string*)(a1 + 72) = "sidebar";
+				*(std::string*)(a1 + 104) = stxt;
+				*(std::string*)(a1 + 136) = "dummy";
+				*(char*)(a1 + 168) = 0;
+				p->sendPacket(a1);
+			}
+		};
+		safeTick(fr);
+		return true;
 	}
 	return false;
 }
@@ -1149,7 +1192,7 @@ void Player::saddLevel(Player* p, int lv) {
 
 void Player::steleport(Player* p, float x, float y, float z) {
 	Vec3 vec3;
-	memcpy(&vec3, 0, sizeof(Vec3));
+	memset(&vec3, 0, sizeof(Vec3));
 	vec3.x = x;
 	vec3.y = y;
 	vec3.z = z;

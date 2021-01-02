@@ -61,6 +61,8 @@ MCCSAPI bool addPlayerItem(const char*, int, short, char);
 MCCSAPI bool disconnectClient(const char*, const char*);
 // 发送给玩家一个文本
 MCCSAPI bool sendText(const char*, const char*);
+// 设置玩家的侧边栏
+MCCSAPI bool setSideBar(const char*, const char*);
 
 // 从此处获取额外API
 MCCSAPI void* getExtraAPI(const char*);

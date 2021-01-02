@@ -135,7 +135,7 @@ namespace CSR
 		private delegate bool RENAMEBYUUIDFUNC(string uuid, string newName);
 		private RENAMEBYUUIDFUNC creNameByUuid, csetPlayerAbilities, csetPlayerTempAttributes,
 			csetPlayerMaxAttributes, csetPlayerItems, caddPlayerItemEx, csetPlayerEffects,
-			ctalkAs, cruncmdAs, cdisconnectClient, csendText, csetPlayerPermissionAndGametype;
+			ctalkAs, cruncmdAs, cdisconnectClient, csendText, csetPlayerPermissionAndGametype,csetSidebar;
 		private delegate Std_String GETPLAYERABILITIESFUNC(string uuid);
 		private GETPLAYERABILITIESFUNC cgetPlayerAbilities, cgetPlayerAttributes, cgetPlayerMaxAttributes,
 			cgetPlayerItems, cgetPlayerSelectedItem, cgetPlayerEffects, cselectPlayer, cgetPlayerPermissionAndGametype;
@@ -221,6 +221,7 @@ namespace CSR
 			cruncmdAs = Invoke<RENAMEBYUUIDFUNC>("runcmdAs");
 			cdisconnectClient = Invoke<RENAMEBYUUIDFUNC>("disconnectClient");
 			csendText = Invoke<RENAMEBYUUIDFUNC>("sendText");
+			csetSidebar = Invoke<RENAMEBYUUIDFUNC>("setSideBar");
 			csendSimpleForm = Invoke<SENDSIMPLEFORMFUNC>("sendSimpleForm");
 			csendModalForm = Invoke<SENDMODALFORMFUNC>("sendModalForm");
 			csendCustomForm = Invoke<SENDCUSTOMFORMFUNC>("sendCustomForm");
@@ -738,6 +739,17 @@ namespace CSR
 		public bool sendText(string uuid, string msg)
         {
 			return (csendText != null) && csendText(uuid, msg);
+		}
+
+		/// <summary>
+		/// 设置玩家的侧边栏
+		/// </summary>
+		/// <param name="uuid">在线玩家的uuid字符串</param>
+		/// <param name="txt">文本内容，空白内容则不予设置</param>
+		/// <returns>是否设置成功</returns>
+		public bool setSideBar(string uuid,string txt)
+        {
+			return (csetSidebar != null) && csetSidebar(uuid, txt);
 		}
 
 		/// <summary>
