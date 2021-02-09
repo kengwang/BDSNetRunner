@@ -158,8 +158,7 @@ namespace CSR
                     egetFromUniqueId = api.ConvertComponentFunc<AGETFROMUNIQUEID>(LEVEL_GETFROM_UNIQUEID);
                     egetsFromAABB = api.ConvertComponentFunc<AGETSFROMAABB>(LEVEL_GETSFROM_AABB);
                     entityApiInited = true;
-                }
-                else
+                } else
                 {
                     return false;
                 }
@@ -181,9 +180,7 @@ namespace CSR
         /// <summary>
         /// 装备栏
         /// </summary>
-        public string ArmorContainer
-        {
-            get
+        public string ArmorContainer { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -191,14 +188,11 @@ namespace CSR
                     return StrTool.c_str(s);
                 }
                 return null;
-            }
-        }
+            } }
         /// <summary>
         /// 攻击力
         /// </summary>
-        public string Attack
-        {
-            get
+        public string Attack { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -206,9 +200,7 @@ namespace CSR
                     return StrTool.c_str(s);
                 }
                 return null;
-            }
-            set
-            {
+            } set {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
                     esetAttack(ptr, value);
@@ -218,9 +210,7 @@ namespace CSR
         /// <summary>
         /// 碰撞箱
         /// </summary>
-        public string CollisionBox
-        {
-            get
+        public string CollisionBox { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -228,8 +218,7 @@ namespace CSR
                     return StrTool.c_str(s);
                 }
                 return null;
-            }
-            set
+            } set
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -255,9 +244,7 @@ namespace CSR
         /// <summary>
         /// 生命值
         /// </summary>
-        public string Health
-        {
-            get
+        public string Health { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -363,17 +350,14 @@ namespace CSR
         /// <summary>
         /// 维度ID
         /// </summary>
-        public int DimensionId
-        {
-            get
+        public int DimensionId { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
                     return egetDimensionId(ptr);
                 }
                 return -1;
-            }
-        }
+            } }
         /// <summary>
         /// 实体类型ID
         /// </summary>
@@ -391,17 +375,14 @@ namespace CSR
         /// <summary>
         /// 查询ID
         /// </summary>
-        public ulong UniqueId
-        {
-            get
+        public ulong UniqueId { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
                     return egetUniqueId(ptr);
                 }
                 return 0;
-            }
-        }
+            } }
         /// <summary>
         /// 从地图中移除该实体
         /// </summary>
@@ -575,15 +556,12 @@ namespace CSR
         /// <param name="y2"></param>
         /// <param name="z2"></param>
         /// <returns>实体指针列表</returns>
-        public static ArrayList getsFromAABB(MCCSAPI api, int did, float x1, float y1, float z1, float x2, float y2, float z2)
-        {
+        public static ArrayList getsFromAABB(MCCSAPI api, int did, float x1, float y1, float z1, float x2, float y2, float z2) {
             if (egetsFromAABB == null)
                 initEntityAPI(api);
             IntPtr pv = egetsFromAABB(did, x1, y1, z1, x2, y2, z2);
-            if (pv != null && pv != IntPtr.Zero)
-            {
-                try
-                {
+            if (pv != null && pv != IntPtr.Zero) {
+                try {
                     return ((Std_Vector)Marshal.PtrToStructure(pv, typeof(Std_Vector))).toList();
                 }
                 catch { }
@@ -601,16 +579,20 @@ namespace CSR
         const string PLAYER_GET_UUID = "player.get_uuid";
         const string PLAYER_GET_IPPORT = "player.get_ipport";
         const string PLAYER_ADD_LEVEL = "player.add_level";
+        const string PLAYER_GET_SCOREID = "player.get_scoreboardid";
+        const string PLAYER_CREATE_SCOREID = "player.create_scoreboardid";
         const string LEVEL_GETPLFROM_AABB = "level.getplfrom_aabb";
         const string PLAYER_TELEPORT = "player.teleport";
 
         protected delegate bool PADDLEVEL(IntPtr p, int lv);
+		protected delegate long PGETSCOREID(IntPtr p);
         protected delegate void PTELEPORT(IntPtr p, float x, float y, float z);
         static AGET pgetHotbarContainer;
         static AGET pgetUuid;
         static AGET pgetIPPort;
         static PADDLEVEL paddLevel;
         static AGETSFROMAABB pgetplFromAABB;
+		static PGETSCOREID pgetScoreboardId, pcreateScoreboardId;
         static PTELEPORT pteleport;
         static bool playerApiInited = false;
 
@@ -625,6 +607,8 @@ namespace CSR
                     pgetIPPort = api.ConvertComponentFunc<AGET>(PLAYER_GET_IPPORT);
                     paddLevel = api.ConvertComponentFunc<PADDLEVEL>(PLAYER_ADD_LEVEL);
                     pteleport = api.ConvertComponentFunc<PTELEPORT>(PLAYER_TELEPORT);
+					pgetScoreboardId = api.ConvertComponentFunc<PGETSCOREID>(PLAYER_GET_SCOREID);
+                    pcreateScoreboardId = api.ConvertComponentFunc<PGETSCOREID>(PLAYER_CREATE_SCOREID);
                     pgetplFromAABB = api.ConvertComponentFunc<AGETSFROMAABB>(LEVEL_GETPLFROM_AABB);
                     playerApiInited = true;
                 }
@@ -643,9 +627,7 @@ namespace CSR
         /// <summary>
         /// 获取玩家热键栏
         /// </summary>
-        public string HotbarContainer
-        {
-            get
+        public string HotbarContainer { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -653,14 +635,11 @@ namespace CSR
                     return StrTool.c_str(s);
                 }
                 return null;
-            }
-        }
+            } }
         /// <summary>
         /// 获取玩家uuid
         /// </summary>
-        public string Uuid
-        {
-            get
+        public string Uuid { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -668,14 +647,11 @@ namespace CSR
                     return StrTool.c_str(s);
                 }
                 return null;
-            }
-        }
+            } }
         /// <summary>
         /// 获取玩家IP和端口
         /// </summary>
-        public string IpPort
-        {
-            get
+        public string IpPort { get
             {
                 if (ptr != null && ptr != IntPtr.Zero)
                 {
@@ -683,8 +659,7 @@ namespace CSR
                     return StrTool.c_str(s);
                 }
                 return null;
-            }
-        }
+            } }
         /// <summary>
         /// 增加玩家等级
         /// </summary>
@@ -695,6 +670,24 @@ namespace CSR
             {
                 paddLevel(ptr, lv);
             }
+        }
+        /// <summary>
+        /// 获取玩家对应计分板ID数值
+        /// </summary>
+        /// <returns>计分板ID值</returns>
+        public long getScoreboardId()
+        {
+            return (ptr != null && ptr != IntPtr.Zero) ?
+                pgetScoreboardId(ptr) : -1;
+        }
+        /// <summary>
+        /// 创建玩家对应计分板ID并获取其值
+        /// </summary>
+        /// <returns>计分板ID值</returns>
+        public long createScoreboardId()
+        {
+            return (ptr != null && ptr != IntPtr.Zero) ?
+                pcreateScoreboardId(ptr) : -1;
         }
         /// <summary>
         /// 从指定地图位置查询玩家指针列表

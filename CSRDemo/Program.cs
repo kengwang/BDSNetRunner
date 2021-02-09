@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using CSR;
 using System.Web.Script.Serialization;
+using System.Threading;
+using System.IO;
+
 namespace CSRDemo
 {
 	class Program {
@@ -53,8 +56,9 @@ namespace CSRDemo
                         }
                         // 常规组件测试
                         Console.WriteLine("玩家攻击力组件：{0}，玩家碰撞箱组件：{1}，玩家生命值组件：{2}，玩家位置组件：{3}，玩家转角组件：{4}" +
-                        "，玩家所处维度：{5}，玩家实体类型：{6}，玩家查询流水号：{7}，玩家UUID：{8}，玩家名字：{9}",
-                        pl.Attack, pl.CollisionBox, pl.Health, pl.Position, pl.Rotation, pl.DimensionId, pl.TypeId, pl.UniqueId, pl.Uuid, pl.getName());
+                        "，玩家所处维度：{5}，玩家实体类型：{6}，玩家查询流水号：{7}，玩家UUID：{8}，玩家名字：{9}，玩家计分板ID：{10}",
+                        pl.Attack, pl.CollisionBox, pl.Health, pl.Position, pl.Rotation, pl.DimensionId, pl.TypeId, pl.UniqueId, pl.Uuid, pl.getName(),
+						pl.getScoreboardId()/* , pl.createScoreboardId() */);
                     }
                     else if (fe.selected == "1"){
                         // 物品栏测试
@@ -464,6 +468,117 @@ namespace CSRDemo
 				{
 					Console.WriteLine("玩家 {0} 在 {1} 的 ({2}) 丢下了 {3} 物品。", ae.playername, ae.dimension, ae.XYZ.x.ToString("F2") + "," +
 						ae.XYZ.y.ToString("F2") + "," + ae.XYZ.z.ToString("F2"), ae.itemname);
+				}
+				return true;
+			});
+			// 计分板数值改变事件
+			api.addAfterActListener(EventKey.onScoreChanged, x =>
+			{
+				Console.WriteLine("[CS] type = {0}, mode = {1}, result= {2}", x.type, x.mode, x.result);
+				ScoreChangedEvent ae = BaseEvent.getFrom(x) as ScoreChangedEvent;
+				if (ae != null)
+                {
+					Console.WriteLine("计分板 {0} (显示名称：{1}，id：{2})分数改变为 {3}",
+						ae.objectivename, ae.displayname, ae.scoreboardid, ae.score);
+					// 追加改变，由于会重复触发改变事件，故设定停止上限
+					//if (ae.score < 100)
+                    //{
+					//	Console.WriteLine("启动30秒后增加分数任务，请耐心等待测试反馈..");
+					//	// 多线程情况下测试离线计分板id是否有效，等待三十秒
+					//	new Thread(() =>
+					//	{
+					//		Thread.Sleep(30000);
+					//		Console.WriteLine("追加改变增加100，数值变为：" + api.setscoreById(ae.scoreboardid, ae.objectivename, ae.score + 100));
+					//		Console.WriteLine("改变后的分数为：" + api.getscoreById(ae.scoreboardid, ae.objectivename));
+					//	}).Start();
+					//}
+                }
+				return true;
+			});
+			// 官方脚本引擎初始化监听
+			api.addAfterActListener(EventKey.onScriptEngineInit, x =>
+			{
+				Console.WriteLine("[CS] type = {0}, mode = {1}, result= {2}", x.type, x.mode, x.result);
+				ScriptEngineInitEvent ae = BaseEvent.getFrom(x) as ScriptEngineInitEvent;
+				if (ae != null && ae.RESULT)
+				{
+					Console.WriteLine("脚本引擎已初始化成功，addr={0}",
+						ae.jseptr);
+					// 延时1s载入外置行为包脚本；延时3s发送一个自定义事件；延时1s载入一段临时脚本
+					new Thread(() =>
+					{
+						Thread.Sleep(1000);
+						try
+						{       // 测试临时行为包脚本注意事项：runScript情况下不会经过 initialize 调用，需主动设置初始化
+							string js = File.ReadAllText("test.js");
+							api.JSErunScript(js, (r) => {
+								if (r)
+									Console.WriteLine("外置测试行为包脚本载入成功。");
+							});
+						} catch { }
+						Thread.Sleep(3000);
+						string jdata = new JavaScriptSerializer().Serialize(new { text = "这是一个自定义测试消息", num = 2021 });
+						api.JSEfireCustomEvent("mytest:testevent", jdata, (r) => {
+							if (r)
+								Console.WriteLine("自定义事件广播发送成功。");
+						});
+						Thread.Sleep(1000);
+						api.JSErunScript("var d = 100;\n console.log('这是一个临时测试脚本')", (r)=>{
+							if (r)
+								Console.WriteLine("测试临时脚本执行成功。");
+						});
+					}).Start();
+				}
+				return true;
+			});
+			// 官方脚本引擎接收日志输出信息监听，拦截
+			api.addBeforeActListener(EventKey.onScriptEngineLog, x =>
+			{
+				Console.WriteLine("[CS] type = {0}, mode = {1}, result= {2}", x.type, x.mode, x.result);
+				ScriptEngineLogEvent ae = BaseEvent.getFrom(x) as ScriptEngineLogEvent;
+				if (ae != null)
+				{
+					Console.WriteLine("[来自脚本的LOG输出] {0}",
+						ae.log);
+				}
+				return false;
+			});
+			// 官方脚本引擎执行指令，或可拦截
+			api.addBeforeActListener(EventKey.onScriptEngineCmd, x =>
+			{
+				Console.WriteLine("[CS] type = {0}, mode = {1}, result= {2}", x.type, x.mode, x.result);
+				ScriptEngineCmdEvent ae = BaseEvent.getFrom(x) as ScriptEngineCmdEvent;
+				if (ae != null)
+				{
+					Console.WriteLine("[脚本引擎试图执行指令] {0}",
+						ae.cmd);
+				}
+				return true;
+			});
+			api.addAfterActListener(EventKey.onScoreboardInit, x =>
+			{
+				Console.WriteLine("[CS] type = {0}, mode = {1}, result= {2}", x.type, x.mode, x.result);
+				var e = BaseEvent.getFrom(x) as ScoreboardInitEvent;
+				if (e != null)
+                {
+					Console.WriteLine("系统计分板已初始化成功，addr={0}",
+						e.scptr);
+					//api.postTick(() => {
+					//	api.runcmd("list");
+					//});
+					//if (api.COMMERCIAL){   // 测试计分板读取和写入任务
+					//	string asc = api.getAllScore();
+					//	Console.WriteLine("[TEST]scoreboard={0}", asc);
+					//	if (!string.IsNullOrEmpty(asc)){
+					//		Console.WriteLine("启动一个延时30秒重置计分板的任务，请耐心等待信息反馈..");
+					//		new Thread(() =>{
+					//			Thread.Sleep(30000);
+					//			if (api.setAllScore(asc)){
+					//				Console.WriteLine("重置任务已发送。");
+					//			}
+					//		}).Start();
+					//	}
+					//}
 				}
 				return true;
 			});

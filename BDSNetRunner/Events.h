@@ -35,7 +35,12 @@ enum class EventType : UINT16 {
 	onChestPair = 30,
 	onMobSpawnCheck = 31,
 	onDropItem = 32,
-	onPickUpItem = 33
+	onPickUpItem = 33,
+	onScoreChanged = 34,
+	onScriptEngineInit = 35,
+	onScriptEngineLog = 36,
+	onScriptEngineCmd = 37,
+	onScoreboardInit = 38
 };
 
 // 监听模式
@@ -76,6 +81,11 @@ struct ACTEVENT {
 	const std::string ONMOBSPAWNCHECK = u8"onMobSpawnCheck";
 	const std::string ONDROPITEM = u8"onDropItem";
 	const std::string ONPICKUPITEM = u8"onPickUpItem";
+	const std::string ONSCORECHANGED = u8"onScoreChanged";
+	const std::string ONSCRIPTENGINEINIT = u8"onScriptEngineInit";
+	const std::string ONSCRIPTENGINELOG = u8"onScriptEngineLog";
+	const std::string ONSCRIPTENGINECMD = u8"onScriptEngineCmd";
+	const std::string ONSCOREBOARDINIT = u8"onScoreboardInit";
 #if (COMMERCIAL)
 	const std::string ONMOBHURT = u8"onMobHurt";
 	const std::string ONBLOCKCMD = u8"onBlockCmd";
@@ -189,23 +199,6 @@ public:
 			blockname = NULL;
 		}
 		((PlayerEvent*)this)->releaseAll();
-	}
-};
-
-struct PickUpItemEvent : PlayerEvent {
-	char* itemname;		// 物品名称
-	short itemid;		// 物品ID
-	short itemaux;		// 物品特殊值
-	void* pplayer;		// 附加组件，生物组件
-public:
-	PickUpItemEvent() {
-		memset(this, 0, sizeof(PickUpItemEvent));
-	}
-	void releaseAll() {
-		if (itemname) {
-			delete itemname;
-			itemname = NULL;
-		}		
 	}
 };
 
@@ -670,5 +663,75 @@ public:
 			delete mobtype;
 			mobtype = NULL;
 		}
+	}
+};
+
+struct PickUpItemEvent : PlayerEvent {
+	char* itemname;		// 物品名称
+	short itemid;		// 物品ID
+	short itemaux;		// 物品特殊值
+	void* pplayer;		// 附加组件，生物组件
+public:
+	PickUpItemEvent() {
+		memset(this, 0, sizeof(PickUpItemEvent));
+	}
+	void releaseAll() {
+		if (itemname) {
+			delete itemname;
+			itemname = NULL;
+		}
+	}
+};
+
+struct ScoreChangedEvent {
+	char* objectivename;		// 计分板名称
+	char* displayname;			// 计分板显示名
+	__int64 scoreboardid;		// 计分板ID值
+	int score;					// 分数
+public:
+	ScoreChangedEvent() {
+		memset(this, 0, sizeof(ScoreChangedEvent));
+	}
+	void releaseAll() {
+		if (objectivename) {
+			delete objectivename;
+			objectivename = NULL;
+		}
+		if (displayname) {
+			delete displayname;
+			displayname = NULL;
+		}
+	}
+};
+
+struct ScriptEngineInitEvent {
+	VA jsen;		// 官方脚本引擎指针
+public:
+	ScriptEngineInitEvent() {
+		memset(this, 0, sizeof(ScriptEngineInitEvent));
+	}
+};
+
+struct ScriptEngineLogEvent : ScriptEngineInitEvent {
+	char* log;		// 官方脚本引擎log输出信息
+public:
+	ScriptEngineLogEvent() {
+		memset(this, 0, sizeof(ScriptEngineLogEvent));
+	}
+	void releaseAll() {
+		if (log) {
+			delete log;
+			log = NULL;
+		}
+	}
+};
+struct ScriptEngineCmdEvent : ScriptEngineLogEvent {
+};
+
+struct ScoreboardInitEvent {
+	VA scptr;		// 系统计分板指针
+public:
+	ScoreboardInitEvent() {
+		memset(this, 0, sizeof(ScoreboardInitEvent));
 	}
 };
