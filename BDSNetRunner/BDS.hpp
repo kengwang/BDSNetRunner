@@ -66,14 +66,14 @@ struct BlockPos : BPos3 {
 
 struct Block {
 	// 获取源
-	const BlockLegacy* getLegacyBlock() const {			// IDA LegacyStructureTemplate::_mapToProperty "waterlogged"
+	const BlockLegacy* getLegacyBlock() const {			// IDA  无需追码 LegacyStructureTemplate::_mapToProperty "waterlogged"
 		return SYMCALL(BlockLegacy*, MSSYM_B1QE14getLegacyBlockB1AA5BlockB2AAE19QEBAAEBVBlockLegacyB2AAA2XZ, this);
 	}
 };
 
 struct BlockActor {
 	// 取方块
-	Block* getBlock() {
+	Block* getBlock() {  //IDA BlockActor::getDebugText L38      v4 = *(_QWORD *)(a1 + ***);     //no valid block 上方
 		return *reinterpret_cast<Block**>(reinterpret_cast<VA>(this) + 16);
 	}
 	// 取方块位置
@@ -113,7 +113,7 @@ struct BlockSource {
 struct Dimension {
 	// 获取方块源
 	VA getBlockSource() {					
-		/* IDA Level::tickEntities   
+		/* IDA Level::tickEntities
 		119 : v14 = j->GetTypeInfoCount;
 		120 : v15 = (struct BlockSource*)*((_QWORD*)v14 + **);
 		*/
@@ -283,7 +283,7 @@ struct Actor {
 	}
 
 	// 是否悬空
-	const BYTE isStand() {				// IDA MovePlayerPacket::MovePlayerPacket(Player &,Vec3 const &)   L26 : *((_BYTE *)this + 73) = *((_BYTE *)a2 + ***);    //此符号可能之后就会丢了,因为真的没什么关键特征
+	const BYTE isStand() {				// IDA MovePlayerPacket::MovePlayerPacket(Player &,Vec3 const &)   L26 : *((_BYTE *)this + 73) = *((_BYTE *)a2 + ***);    //此符号可能之后会追丢了,因为真的没什么关键特征
 		return *reinterpret_cast<BYTE*>(reinterpret_cast<VA>(this) + 448);
 	}
 
@@ -460,7 +460,7 @@ struct ItemStack : ItemStackBase {
 	}
 	// 取物品名称
 	std::string getName() {
-		std::string str;				// IDA ItemStackBase::getName
+		std::string str;				// IDA 无需追码 ItemStackBase::getName
 		SYMCALL(__int64,
 			MSSYM_MD5_6d581a35d7ad70fd364b60c3ebe93394,
 			this, &str);

@@ -49,7 +49,7 @@ struct Objective {
 		return *(std::string*)((VA)this + 64);
 	}
 	//获取计分板展示名称
-	auto getscoredisplayname() {
+	auto getscoredisplayname() {   // IDA Objective::Objective L18   std::string::string((void *)(a1 + **), a2);
 		return *(std::string*)((VA)this + 96);
 	}
 };

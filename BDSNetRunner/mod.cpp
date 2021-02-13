@@ -18,7 +18,7 @@
 #pragma comment(lib, "mscoree.lib")
 
 // 当前插件平台版本号
-static const wchar_t* VERSION = L"1.16.201.02";
+static const wchar_t* VERSION = L"1.16.201.03";
 static const wchar_t* ISFORCOMMERCIAL = L"1";
 
 static bool netregok = false;
@@ -1114,8 +1114,8 @@ bool Actor::ssetCollisionBox(Actor* e, const char* box) {
 		float w = jv["width"].asFloat();
 		float h = jv["height"].asFloat();
 		if (w != 0 && h != 0) {
-			*((float*)e + 295) = w;    // IDA Actor::_refreshAABB   L15   v1 = *((float *)this + ***) * 0.5;
-			*((float*)e + 296) = h;    // IDA Actor::_refreshAABB   L24     v8 = v6 + *((float *)this + ***);
+			*((float*)e + 301) = w;    // IDA Actor::_refreshAABB   L15   v1 = *((float *)this + ***) * 0.5;
+			*((float*)e + 302) = h;    // IDA Actor::_refreshAABB   L24     v8 = v6 + *((float *)this + ***);
 			SYMCALL(VA, MSSYM_B1QA7setSizeB1AA5ActorB2AAA7UEAAXMMB1AA1Z, e, w, h);
 			// IDA 下 Actor::initializeComponents 中调用 SynchedActorData::set<float>     SynchedActorData::set<float>((__int64 *)(a1 + ***), 0x26u, v67);
 			SYMCALL(VA, MSSYM_B3QQDA3setB1AA1MB1AE16SynchedActorDataB2AAE10QEAAXGAEBMB1AA1Z, (VA)e + 352, ActorDataIDs::WIDTH, &w);
@@ -1289,7 +1289,7 @@ bool Actor::ssetRotation(Actor* e, const char* jr) {
 		if (Actor::sgetEntityTypeId(e) == 319) {
 			Vec3 c3;
 			memcpy(&c3, e->getPos(), sizeof(Vec3));
-			float h = *((float*)e + 296);				// IDA Actor::_refreshAABB   往上搜索 有注释的
+			float h = *((float*)e + 302);				// IDA Actor::_refreshAABB   往上搜索 有注释的
 			c3.y -= (float)(1.7999999523162842 * 0.9);
 			auto v9 = (int)ActorType::Player_0;
 			SYMCALL(VA, MSSYM_B1QE10teleportToB1AA6PlayerB2AAE13UEAAXAEBVVec3B3AAUE20NHHAEBUActorUniqueIDB3AAAA1Z, e, &c3, 1, 0,
@@ -1385,6 +1385,7 @@ std::string Player::sgetUuid(Player* p) {
 std::string Player::sgetIPPort(Player* p) {
 	//这边原作者写了一大堆,注释都没一个,完全看不懂,直接从头开始撸一个
 	//NetworkIdentifier::toString    
+	/*
 	VA v12[3];
 	void* v37[3]; // [rsp+48h] [rbp-38h] BYREF
 
@@ -1393,7 +1394,9 @@ std::string Player::sgetIPPort(Player* p) {
 	//lambda_64e6c8f496c7c508bd4061bd8348d78e_::operator()  L318
 	std::string ip = v45;
 	// IDA   NetworkIdentifier::toString   ->    NetworkIdentifier::getAddress
-	return ip;
+	*/
+	//TODO
+	return "0.0.0.0:19132";
 }
 
 void Player::saddLevel(Player* p, int lv) {
