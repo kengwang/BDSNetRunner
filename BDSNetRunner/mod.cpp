@@ -18,7 +18,7 @@
 #pragma comment(lib, "mscoree.lib")
 
 // 当前插件平台版本号
-static const wchar_t* VERSION = L"1.16.100.4";
+static const wchar_t* VERSION = L"1.16.201.02";
 static const wchar_t* ISFORCOMMERCIAL = L"1";
 
 static bool netregok = false;
@@ -642,7 +642,7 @@ bool setSideBar(const char* uuid, const char* txt) {
 // 参数类型：字符串，字符串 , 整数型
 // 参数详解：uuid - 在线玩家的uuid字符串，txt - 标题内容 , type - 标题类型
 // 返回值：是否发送成功
-bool setTitle(const char* uuid, const char* txt,int type) {
+bool setTitle(const char* uuid, const char* txt, int type) {
 	Player* p = onlinePlayers[uuid];
 	if (playerSign[p]) {
 		std::string suuid = uuid;
@@ -650,7 +650,7 @@ bool setTitle(const char* uuid, const char* txt,int type) {
 		auto s = GBKToUTF8(txt);
 		if (s.length())
 			stxt = s;
-		auto fr = [suuid, stxt,type]() {
+		auto fr = [suuid, stxt, type]() {
 			Player* p = onlinePlayers[suuid];
 			if (playerSign[p]) {
 				VA a1;
@@ -943,7 +943,7 @@ int getscoreById(__int64 id, const char* objname) {
 		return 0;
 	}
 	__int64 a2[2];
-	__int64 sid[2]{0};
+	__int64 sid[2]{ 0 };
 	sid[0] = id;
 	if (findScoreboardId(id, sid)) {
 		auto scores = ((Objective*)testobj)->getplayerscoreinfo((ScoreInfo*)a2, (PlayerScoreboardId*)&sid);
@@ -962,7 +962,7 @@ int getscoreById(__int64 id, const char* objname) {
 int setscoreById(__int64 id, const char* objname, int count) {
 	if (!scoreboard)
 		return 0;
-	__int64 sid[2]{0};
+	__int64 sid[2]{ 0 };
 	sid[0] = id;
 	auto testobj = scoreboard->getObjective(objname);
 	if (!testobj) {
@@ -1045,7 +1045,7 @@ static void getDamageInfo(void* p, void* dsrc, MobDieEvent* ue) {			// IDA Mob::
 std::string Actor::sgetArmorContainer(Actor* e) {
 	VA parmor = ((Mob*)e)->getArmor();
 	std::vector<ItemStack*> armors;
-	(*(void(**)(VA, VA))(**(VA**)parmor + 152))(*(VA*)parmor, (VA)&armors);		// IDA Mob::addAdditionalSaveData
+	(*(void(**)(VA, VA))(**(VA**)parmor + 152))(*(VA*)parmor, (VA)&armors);		// IDA Mob::addAdditionalSaveData  : 114   (*(void (__fastcall **)(_QWORD, void **))(**((_QWORD **)this + 不管) + ****))(*((_QWORD *)this + 不管), v55);
 	Json::Value jv;
 	if (armors.size() > 0) {
 		for (size_t i = 0, l = armors.size(); i < l; i++) {
@@ -1064,8 +1064,8 @@ std::string Actor::sgetArmorContainer(Actor* e) {
 }
 
 std::string Actor::sgetAttack(Actor* e) {
-	if (*(VA*)(((VA*)e)[32] + 696)) {	// IDA ScriptAttackComponent::retrieveComponentFrom
-		VA atattr = (*(VA(__fastcall**)(Actor*, VA*))(*(VA*)e + 1552))(
+	if (*(VA*)(((VA*)e)[32] + 696)) {	// IDA ScriptAttackComponent::retrieveComponentFrom L24     v8 = *(_QWORD *)(*((_QWORD *)a5 + ***) + ****);
+		VA atattr = (*(VA(__fastcall**)(Actor*, VA*))(*(VA*)e + 1552))( // IDA ScriptAttackComponent::retrieveComponentFrom  L25:  v9 = (*(__int64 (__fastcall **)(struct Actor *, void *, struct ScriptEngine *, struct ScriptServerContext *))(*(_QWORD *)a5 + ****))(
 			e,
 			SYM_POINT(VA, MSSYM_B1QA6ATTACKB1UA6DAMAGEB1AE16SharedAttributesB2AAE112VAttributeB2AAA1B));
 		if (*(VA*)(atattr + 16)) {
@@ -1085,7 +1085,7 @@ bool Actor::ssetAttack(Actor* e, const char* damage) {
 	if (!jv.isNull()) {
 		float dmin = jv["range_min"].asFloat();
 		float dmax = jv["range_max"].asFloat();
-		VA mptr = ((VA*)e)[140];					// IDA ScriptAttackComponent::applyComponentTo
+		VA mptr = ((VA*)e)[140];					// IDA ScriptAttackComponent::applyComponentTo  L33 这个我也没搞懂,不建议改  v7 = (BaseAttributeMap *)*((_QWORD *)a5 + ***);
 		if (mptr) {
 			VA v20 = SYMCALL(VA, MSSYM_B1QE17registerAttributeB1AE16BaseAttributeMapB2AAE25QEAAAEAVAttributeInstanceB2AAE13AEBVAttributeB3AAAA1Z,
 				mptr, SYM_POINT(VA, MSSYM_B1QA6ATTACKB1UA6DAMAGEB1AE16SharedAttributesB2AAE112VAttributeB2AAA1B));
@@ -1100,8 +1100,8 @@ bool Actor::ssetAttack(Actor* e, const char* damage) {
 }
 
 std::string Actor::sgetCollisionBox(Actor* e) {
-	float w = *((float*)e + 295);		// IDA Actor::_refreshAABB
-	float h = *((float*)e + 296);
+	float w = *((float*)e + 301);		// IDA Actor::_refreshAABB   L15   v1 = *((float *)this + ***) * 0.5;
+	float h = *((float*)e + 302);       // IDA Actor::_refreshAABB   L24     v8 = v6 + *((float *)this + ***);
 	Json::Value jv;
 	jv["width"] = w;
 	jv["height"] = h;
@@ -1113,10 +1113,11 @@ bool Actor::ssetCollisionBox(Actor* e, const char* box) {
 	if (!jv.isNull()) {
 		float w = jv["width"].asFloat();
 		float h = jv["height"].asFloat();
-		if (w != 0 && h != 0) {			// IDA SynchedActorData::set<float>
-			*((float*)e + 295) = w;
-			*((float*)e + 296) = h;
+		if (w != 0 && h != 0) {
+			*((float*)e + 295) = w;    // IDA Actor::_refreshAABB   L15   v1 = *((float *)this + ***) * 0.5;
+			*((float*)e + 296) = h;    // IDA Actor::_refreshAABB   L24     v8 = v6 + *((float *)this + ***);
 			SYMCALL(VA, MSSYM_B1QA7setSizeB1AA5ActorB2AAA7UEAAXMMB1AA1Z, e, w, h);
+			// IDA 下 Actor::initializeComponents 中调用 SynchedActorData::set<float>     SynchedActorData::set<float>((__int64 *)(a1 + ***), 0x26u, v67);
 			SYMCALL(VA, MSSYM_B3QQDA3setB1AA1MB1AE16SynchedActorDataB2AAE10QEAAXGAEBMB1AA1Z, (VA)e + 352, ActorDataIDs::WIDTH, &w);
 			SYMCALL(VA, MSSYM_B3QQDA3setB1AA1MB1AE16SynchedActorDataB2AAE10QEAAXGAEBMB1AA1Z, (VA)e + 352, ActorDataIDs::HEIGHT, &h);
 			return true;
@@ -1129,11 +1130,11 @@ std::string Actor::sgetHandContainer(Actor* e) {
 	VA phand = ((Mob*)e)->getHands();
 	if (phand) {
 		Json::Value jv;
-		std::vector<ItemStack*> hands;		// IDA ScriptHandContainerComponent::retrieveComponentFrom
-		(ItemStack*)(*(VA(__fastcall**)(VA, VA))(**(VA**)phand + 152))(
+		std::vector<ItemStack*> hands;
+		(ItemStack*)(*(VA(__fastcall**)(VA, VA))(**(VA**)phand + 152))(  // IDA ScriptHandContainerComponent::retrieveComponentFrom  L19      + ***))( 
 			*(VA*)phand, (VA)&hands);
 		if (Actor::sgetEntityTypeId(e) == 319) {
-			ItemStack* v6 = (*(ItemStack *(__fastcall**)(Actor*))(*(VA*)e + 1216))(e);
+			ItemStack* v6 = (*(ItemStack * (__fastcall**)(Actor*))(*(VA*)e + 1216))(e);   // L26 v7 = *(const struct ItemStack *(__fastcall **)(Player *__hidden))(*(_QWORD *)a5 + ****);
 			hands[0] = v6;
 		}
 		for (VA i = 0, l = hands.size(); i < l; i++) {
@@ -1152,7 +1153,7 @@ std::string Actor::sgetHandContainer(Actor* e) {
 }
 
 std::string Actor::sgetHealth(Actor* e) {
-	VA bpattrmap = ((VA*)e)[140];			// IDA ScriptHealthComponent::retrieveComponentFrom
+	VA bpattrmap = ((VA*)e)[143];			// IDA ScriptHealthComponent::retrieveComponentFrom   L15   v7 = (BaseAttributeMap *)*((_QWORD *)a5 + ***);
 	if (bpattrmap) {
 		VA hattr = SYMCALL(VA, MSSYM_B1QE18getMutableInstanceB1AE16BaseAttributeMapB2AAE25QEAAPEAVAttributeInstanceB2AAA1IB1AA1Z,
 			bpattrmap, SYM_OBJECT(UINT32, MSSYM_B1QA6HEALTHB1AE16SharedAttributesB2AAE112VAttributeB2AAA1B + 4));
@@ -1192,7 +1193,7 @@ std::string Actor::sgetInventoryContainer(Actor* e) {
 	std::vector<ItemStack*> bag;		// IDA ScriptInventoryContainerComponent::retrieveComponentFrom
 	if (Actor::sgetEntityTypeId(e) == 319) {	// 玩家
 		VA cont = ((Player*)e)->getSupplies();
-		(*(void(__fastcall**)(VA, void*))(*(VA*)cont + 152))(
+		(*(void(__fastcall**)(VA, void*))(*(VA*)cont + 152))(   //     L51   (*(void (__fastcall **)(_QWORD, void **))(**(_QWORD **)(v10 + 8) + ***))(*(_QWORD *)(v10 + 8), v17);
 			cont,
 			&bag);
 	}
@@ -1227,10 +1228,11 @@ bool Actor::ssetName(Actor* e, const char* n, bool alwaysShow) {
 	std::string nname = GBKToUTF8(n);
 	if (Actor::sgetEntityTypeId(e) == 319) {
 		((Player*)e)->reName(nname);
-	} else
+	}
+	else
 		SYMCALL(VA, MSSYM_MD5_2f9772d3549cbbfca05bc883e3dd5c30, e, nname);
-	bool v = alwaysShow;					// IDA SynchedActorData::set<signed char>
-	SYMCALL(VA, MSSYM_B3QQDA3setB1AA1CB1AE16SynchedActorDataB2AAE10QEAAXGAEBCB1AA1Z, (VA)e + 352, ActorDataIDs::NAMETAG_ALWAYS_SHOW, &v);
+	bool v = alwaysShow;
+	SYMCALL(VA, MSSYM_B3QQDA3setB1AA1CB1AE16SynchedActorDataB2AAE10QEAAXGAEBCB1AA1Z, (VA)e + 352, ActorDataIDs::NAMETAG_ALWAYS_SHOW, &v);// IDA  Actor::initializeComponents 中调用的  SynchedActorData::set<signed char>((__int64 *)(a1 + ***), 0x2Cu, (unsigned __int8 *)v100);
 	return true;
 }
 
@@ -1254,7 +1256,7 @@ bool Actor::ssetPosition(Actor* e, const char* jpos) {
 		v.y = jv["y"].asFloat();
 		v.z = jv["z"].asFloat();
 		int v9 = (int)ActorType::Undefined_2;		// IDA ScriptPositionComponent::applyComponentTo
-		(*(void(__fastcall**)(Actor*, Vec3*, VA, VA, signed int, VA*))(*(VA*)e + 272))(
+		(*(void(__fastcall**)(Actor*, Vec3*, VA, VA, signed int, VA*))(*(VA*)e + 272))(  //   L34 (*(void (__fastcall **)(struct Actor *, __int64 *, __int64, _QWORD, int, __int64 *, _DWORD))(*(_QWORD *)a5 + ***))(
 			e, &v, 1, 0, v9, SYM_POINT(VA, MSSYM_B1QA7INVALIDB1UA2IDB1AE13ActorUniqueIDB2AAA32U1B1AA1B));
 		if (Actor::sgetEntityTypeId(e) == 319) {
 			v9 = (int)ActorType::Player_0;
@@ -1268,7 +1270,7 @@ bool Actor::ssetPosition(Actor* e, const char* jpos) {
 
 std::string Actor::sgetRotation(Actor* e) {
 	Json::Value jv;
-	float x = ((float*)e)[72];					// IDA Actor::setRot
+	float x = ((float*)e)[72];					// IDA Actor::setRot   L7   *((_DWORD *)this + ***) = *(_DWORD *)a2;
 	float y = ((float*)e)[73];
 	jv["x"] = x;
 	jv["y"] = y;
@@ -1287,7 +1289,7 @@ bool Actor::ssetRotation(Actor* e, const char* jr) {
 		if (Actor::sgetEntityTypeId(e) == 319) {
 			Vec3 c3;
 			memcpy(&c3, e->getPos(), sizeof(Vec3));
-			float h = *((float*)e + 296);				// IDA Actor::_refreshAABB
+			float h = *((float*)e + 296);				// IDA Actor::_refreshAABB   往上搜索 有注释的
 			c3.y -= (float)(1.7999999523162842 * 0.9);
 			auto v9 = (int)ActorType::Player_0;
 			SYMCALL(VA, MSSYM_B1QE10teleportToB1AA6PlayerB2AAE13UEAAXAEBVVec3B3AAUE20NHHAEBUActorUniqueIDB3AAAA1Z, e, &c3, 1, 0,
@@ -1303,7 +1305,9 @@ int Actor::sgetDimensionId(Actor* e) {
 }
 
 int Actor::sgetEntityTypeId(Actor* e) {
-	return (*(int(__fastcall**)(Actor*))(*(VA*)e + 1288))(e);	// IDA ScriptPositionComponent::applyComponentTo
+	return (*(int(__fastcall**)(Actor*))(*(VA*)e + 1288))(e);
+	// IDA ScriptPositionComponent::applyComponentTo  L42 if ( (*(unsigned int (__fastcall **)(struct Actor *))(*(_QWORD *)a5 + ****))(a5) == 319 )
+	// 注 Player 目前是 319
 }
 
 VA Actor::sgetUniqueID(Actor* e) {
@@ -1311,8 +1315,9 @@ VA Actor::sgetUniqueID(Actor* e) {
 }
 
 bool Actor::sremove(Actor* e) {
-	(*(void(**)(Actor*))(*(VA*)e + 88))(e);			// IDA Actor::remove , check vtable
-	return *((char*)e + 945) == 1;
+	//(*(void(**)(Actor*))(*(VA*)e + 88))(e);			// IDA Actor::remove , check vtable  追码失败
+	SYMCALL(void, MSSYM_B1QA6removeB1AA5ActorB2AAA7UEAAXXZ, e); //我应该看懂上面的意思了,用SYMCALL不香?
+	return *((char*)e + 961) == 1;   //L49   *((_BYTE *)this + ***) = 1;
 }
 
 bool Actor::shurt(Actor* e, Actor* se, ActorDamageCause c, int count, bool knock, bool ignite) {
@@ -1324,7 +1329,7 @@ bool Actor::shurt(Actor* e, Actor* se, ActorDamageCause c, int count, bool knock
 		((VA*)&dmg)[0] = (VA)SYM_POINT(VA, MSSYM_B3QQUE187ActorDamageSourceB2AAA26BB1A);
 		((VA*)&dmg)[1] = (VA)c;
 	}
-	auto _hurt = *(bool(**)(Actor*, void*, int, bool, bool))(*(VA*)e + 0x798);		// IDA Actor::_hurt, check vtable
+	auto _hurt = *(bool(**)(Actor*, void*, int, bool, bool))(*(VA*)e + 1944);		// IDA Actor::hurt    L8    result = (*(__int64 (__fastcall **)(Actor *, const struct ActorDamageSource *, _QWORD, _QWORD, bool))(*(_QWORD *)this + ****))(
 	return _hurt(e, &dmg, count, knock, ignite);
 }
 
@@ -1351,7 +1356,7 @@ std::vector<VA*>* Actor::sgetEntities(int did, float x1, float y1, float z1, flo
 std::string Player::sgetHotbarContainer(Player* p) {
 	VA cont = p->getSupplies();
 	if (cont) {
-		std::vector<ItemStack*> its;		// IDA ScriptHotbarContainerComponent::retrieveComponentFrom
+		std::vector<ItemStack*> its;		// IDA ScriptHotbarContainerComponent::retrieveComponentFrom   L26     (*(void (__fastcall **)(_QWORD, void **))(**(_QWORD **)(*((_QWORD *)a5 + 378) + 176i64) + ****))(
 		(*(void(__fastcall**)(VA, void*))(*(VA*)cont + 152))(
 			cont,
 			&its);
@@ -1378,14 +1383,17 @@ std::string Player::sgetUuid(Player* p) {
 }
 
 std::string Player::sgetIPPort(Player* p) {
-	char v11[256];
-	char v12[256]{0};
-	VA v4 = *(VA*)(*(VA*)(*(VA*)(p_ServerNetworkHandle + 64) + 32) + 440);
-	auto v5 = GetModuleHandleW(0);
-	((void(*)(VA))(v5 + 1433268))((VA)v11);
-	((void(*)(VA, VA, VA))(v5 + 1440164))(v4, (VA)v11, (VA)p + 2512);
-	((void(*)(VA, bool, VA))(v5 + 1433184))((VA)v11, 1, (VA)v12);
-	return std::string(v12);
+	//这边原作者写了一大堆,注释都没一个,完全看不懂,直接从头开始撸一个
+	//NetworkIdentifier::toString    
+	VA v12[3];
+	void* v37[3]; // [rsp+48h] [rbp-38h] BYREF
+
+	// IDA  2536 是 Player::Player 找 NetworkIdentifier
+	std::string v45 = SYMCALL(std::string, MSSYM_MD5_70e9afc25f27609ea9ef8f7b14731529, (VA*)(p + 2536), v12);
+	//lambda_64e6c8f496c7c508bd4061bd8348d78e_::operator()  L318
+	std::string ip = v45;
+	// IDA   NetworkIdentifier::toString   ->    NetworkIdentifier::getAddress
+	return ip;
 }
 
 void Player::saddLevel(Player* p, int lv) {
@@ -1566,7 +1574,7 @@ static bool _CS_ONSERVERCMD(VA _this, std::string* cmd) {
 	se.releaseAll();
 	return ret;
 }
-static VA ONSERVERCMD_SYMS[] = {1, MSSYM_MD5_b5c9e566146b3136e6fb37f0c080d91e, (VA)_CS_ONSERVERCMD };
+static VA ONSERVERCMD_SYMS[] = { 1, MSSYM_MD5_b5c9e566146b3136e6fb37f0c080d91e, (VA)_CS_ONSERVERCMD };
 
 
 // 服务器后台指令输出
@@ -1594,7 +1602,7 @@ static VA _CS_ONSERVERCMDOUTPUT(VA handle, char* str, VA size) {
 	}
 	return original(handle, str, size);
 }
-static VA ONSERVERCMDOUTPUT_SYMS[] = {1, MSSYM_MD5_b5f2f0a753fc527db19ac8199ae8f740, (VA)_CS_ONSERVERCMDOUTPUT};
+static VA ONSERVERCMDOUTPUT_SYMS[] = { 1, MSSYM_MD5_b5f2f0a753fc527db19ac8199ae8f740, (VA)_CS_ONSERVERCMDOUTPUT };
 
 
 // 玩家选择表单
@@ -1630,7 +1638,7 @@ static void _CS_ONFORMSELECT(VA _this, VA id, VA handle, ModalFormResponsePacket
 	}
 	original(_this, id, handle, fp);
 }
-static VA ONFORMSELECT_SYMS[] = {1, MSSYM_MD5_8b7f7560f9f8353e6e9b16449ca999d2, (VA)_CS_ONFORMSELECT};
+static VA ONFORMSELECT_SYMS[] = { 1, MSSYM_MD5_8b7f7560f9f8353e6e9b16449ca999d2, (VA)_CS_ONFORMSELECT };
 
 // 玩家操作物品
 static bool _CS_ONUSEITEM(void* _this, ItemStack* item, BlockPos* pBlkpos, unsigned __int8 a4, void* v5, Block* pBlk) {
@@ -1662,8 +1670,8 @@ static bool _CS_ONUSEITEM(void* _this, ItemStack* item, BlockPos* pBlkpos, unsig
 	ue.releaseAll();
 	return ret;
 }
-static VA ONUSEITEM_SYMS[] = {1, MSSYM_B1QA9useItemOnB1AA8GameModeB2AAA4UEAAB1UE14NAEAVItemStackB2AAE12AEBVBlockPosB2AAA9EAEBVVec3B2AAA9PEBVBlockB3AAAA1Z,
-	(VA)_CS_ONUSEITEM};
+static VA ONUSEITEM_SYMS[] = { 1, MSSYM_B1QA9useItemOnB1AA8GameModeB2AAA4UEAAB1UE14NAEAVItemStackB2AAE12AEBVBlockPosB2AAA9EAEBVVec3B2AAA9PEBVBlockB3AAAA1Z,
+	(VA)_CS_ONUSEITEM };
 
 // 玩家放置方块
 static bool _CS_ONPLACEDBLOCK(BlockSource* _this, Block* pBlk, BlockPos* pBlkpos, unsigned __int8 a4, struct Actor* pPlayer, bool _bool) {
@@ -1694,12 +1702,12 @@ static bool _CS_ONPLACEDBLOCK(BlockSource* _this, Block* pBlk, BlockPos* pBlkpos
 	return original(_this, pBlk, pBlkpos, a4, pPlayer, _bool);
 }
 static VA ONPLACEDBLOCK_SYMS[] = { 1, MSSYM_B1QA8mayPlaceB1AE11BlockSourceB2AAA4QEAAB1UE10NAEBVBlockB2AAE12AEBVBlockPosB2AAE10EPEAVActorB3AAUA1NB1AA1Z ,
-(VA)_CS_ONPLACEDBLOCK};
+(VA)_CS_ONPLACEDBLOCK };
 
 // 玩家破坏方块
 static bool _CS_ONDESTROYBLOCK(void* _this, BlockPos* pBlkpos) {
 	auto pPlayer = *reinterpret_cast<Player**>(reinterpret_cast<VA>(_this) + 8);
-	auto pBlockSource = pPlayer->getRegion();					// IDA GameMode::_destroyBlockInternal
+	auto pBlockSource = pPlayer->getRegion();
 	auto pBlk = pBlockSource->getBlock(pBlkpos);
 	Events e;
 	e.type = EventType::onDestroyBlock;
@@ -1723,8 +1731,8 @@ static bool _CS_ONDESTROYBLOCK(void* _this, BlockPos* pBlkpos) {
 	de.releaseAll();
 	return ret;
 }
-static VA ONDESTROYBLOCK_SYMS[] = {1, MSSYM_B2QUE20destroyBlockInternalB1AA8GameModeB2AAA4AEAAB1UE13NAEBVBlockPosB2AAA1EB1AA1Z,
-	(VA)_CS_ONDESTROYBLOCK};
+static VA ONDESTROYBLOCK_SYMS[] = { 1, MSSYM_B2QUE20destroyBlockInternalB1AA8GameModeB2AAA4AEAAB1UE13NAEBVBlockPosB2AAA1EB1AA1Z,
+	(VA)_CS_ONDESTROYBLOCK };
 
 // 玩家开箱准备
 static bool _CS_ONCHESTBLOCKUSE(void* _this, Player* pPlayer, BlockPos* pBlkpos) {
@@ -1781,8 +1789,8 @@ static bool _CS_ONBARRELBLOCKUSE(void* _this, Player* pPlayer, BlockPos* pBlkpos
 	de.releaseAll();
 	return ret;
 }
-static VA ONSTARTOPENBARREL_SYMS[] = {1, MSSYM_B1QA3useB1AE11BarrelBlockB2AAA4UEBAB1UE11NAEAVPlayerB2AAE12AEBVBlockPosB2AAA1EB1AA1Z,
-	(VA)_CS_ONBARRELBLOCKUSE};
+static VA ONSTARTOPENBARREL_SYMS[] = { 1, MSSYM_B1QA3useB1AE11BarrelBlockB2AAA4UEBAB1UE11NAEAVPlayerB2AAE12AEBVBlockPosB2AAA1EB1AA1Z,
+	(VA)_CS_ONBARRELBLOCKUSE };
 
 // 玩家关闭箱子
 static void _CS_ONSTOPOPENCHEST(void* _this, Player* pPlayer) {
@@ -1809,8 +1817,8 @@ static void _CS_ONSTOPOPENCHEST(void* _this, Player* pPlayer) {
 	runCscode(ActEvent.ONSTOPOPENCHEST, ActMode::AFTER, e);
 	de.releaseAll();
 }
-static VA ONSTOPOPENCHEST_SYMS[] = {1, MSSYM_B1QA8stopOpenB1AE15ChestBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
-	(VA)_CS_ONSTOPOPENCHEST};
+static VA ONSTOPOPENCHEST_SYMS[] = { 1, MSSYM_B1QA8stopOpenB1AE15ChestBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
+	(VA)_CS_ONSTOPOPENCHEST };
 
 // 玩家关闭木桶
 static void _CS_STOPOPENBARREL(void* _this, Player* pPlayer) {
@@ -1837,13 +1845,13 @@ static void _CS_STOPOPENBARREL(void* _this, Player* pPlayer) {
 	runCscode(ActEvent.ONSTOPOPENBARREL, ActMode::AFTER, e);
 	de.releaseAll();
 }
-static VA ONSTOPOPENBARREL_SYMS[] = {1, MSSYM_B1QA8stopOpenB1AE16BarrelBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
-	(VA)_CS_STOPOPENBARREL};
+static VA ONSTOPOPENBARREL_SYMS[] = { 1, MSSYM_B1QA8stopOpenB1AE16BarrelBlockActorB2AAE15UEAAXAEAVPlayerB3AAAA1Z,
+	(VA)_CS_STOPOPENBARREL };
 
 // 玩家放入取出数量
 static void _CS_ONSETSLOT(LevelContainerModel* a1, VA a2) {
 	auto original = (void(*)(LevelContainerModel*, VA)) * getOriginalData(_CS_ONSETSLOT);
-	VA* v3 = *((VA**)a1 + 26);							// IDA LevelContainerModel::_getContainer
+	VA* v3 = *((VA**)a1 + 26);							// IDA LevelContainerModel::_getContainer   L15     v2 = (_QWORD *)*((_QWORD *)this + ****);
 	BlockSource* bs = *(BlockSource**)(v3[106] + 80);
 	BlockPos* pBlkpos = (BlockPos*)((char*)a1 + 216);
 	Block* pBlk = bs->getBlock(pBlkpos);
@@ -1889,8 +1897,8 @@ static void _CS_ONSETSLOT(LevelContainerModel* a1, VA a2) {
 	else
 		original(a1, a2);
 }
-static VA ONSETSLOT_SYMS[] = {1, MSSYM_B1QE23containerContentChangedB1AE19LevelContainerModelB2AAA6UEAAXHB1AA1Z,
-	(VA)_CS_ONSETSLOT};
+static VA ONSETSLOT_SYMS[] = { 1, MSSYM_B1QE23containerContentChangedB1AE19LevelContainerModelB2AAA6UEAAXHB1AA1Z,
+	(VA)_CS_ONSETSLOT };
 
 // 玩家切换维度
 static bool _CS_ONCHANGEDIMENSION(void* _this, Player* pPlayer, void* req) {
@@ -1917,8 +1925,8 @@ static bool _CS_ONCHANGEDIMENSION(void* _this, Player* pPlayer, void* req) {
 	de.releaseAll();
 	return ret;
 }
-static VA ONCHANGEDIMENSION_SYMS[] = {1, MSSYM_B2QUE21playerChangeDimensionB1AA5LevelB2AAA4AEAAB1UE11NPEAVPlayerB2AAE26AEAVChangeDimensionRequestB3AAAA1Z ,
-	(VA)_CS_ONCHANGEDIMENSION};
+static VA ONCHANGEDIMENSION_SYMS[] = { 1, MSSYM_B2QUE21playerChangeDimensionB1AA5LevelB2AAA4AEAAB1UE11NPEAVPlayerB2AAE26AEAVChangeDimensionRequestB3AAAA1Z ,
+	(VA)_CS_ONCHANGEDIMENSION };
 
 // 生物死亡
 static void _CS_ONMOBDIE(Mob* _this, void* dmsg) {
@@ -1932,7 +1940,7 @@ static void _CS_ONMOBDIE(Mob* _this, void* dmsg) {
 	e.data = &de;
 	bool ret = runCscode(ActEvent.ONMOBDIE, ActMode::BEFORE, e);
 	if (ret) {
-		auto original = (void(*)(Mob*, void*))*getOriginalData(_CS_ONMOBDIE);
+		auto original = (void(*)(Mob*, void*)) * getOriginalData(_CS_ONMOBDIE);
 		original(_this, dmsg);
 		e.result = ret;
 		e.mode = ActMode::AFTER;
@@ -1987,7 +1995,7 @@ static void _CS_ONCHAT(void* _this, std::string& player_name, std::string& targe
 	}
 	de.releaseAll();
 }
-static VA ONCHAT_SYMS[] = {1, MSSYM_MD5_ad251f2fd8c27eb22c0c01209e8df83c, (VA)_CS_ONCHAT };
+static VA ONCHAT_SYMS[] = { 1, MSSYM_MD5_ad251f2fd8c27eb22c0c01209e8df83c, (VA)_CS_ONCHAT };
 
 // 输入文本
 static void _CS_ONINPUTTEXT(VA _this, VA id, TextPacket* tp) {
@@ -2070,7 +2078,6 @@ THook2(_CS_ONCREATEPLAYER, VA,
 	autoByteCpy(&le.playername, pPlayer->getNameTag().c_str());
 	auto uuid = pPlayer->getUuid()->toString();
 	autoByteCpy(&le.uuid, uuid.c_str());
-	autoByteCpy(&le.xuid, pPlayer->getXuid(p_level).c_str());
 #if (COMMERCIAL)
 	autoByteCpy(&le.ability, getAbilities(pPlayer).toStyledString().c_str());
 #endif
@@ -2169,8 +2176,8 @@ static VA _CS_ONMOVE(void* _this, Player* pPlayer, char v3, int v4, int v5) {
 	de.releaseAll();
 	return reto;
 }
-static VA ONMOVE_SYMS[] = {1, MSSYM_B2QQE170MovePlayerPacketB2AAA4QEAAB1AE10AEAVPlayerB2AAE14W4PositionModeB1AA11B1AA2HHB1AA1Z,
-	(VA)_CS_ONMOVE};
+static VA ONMOVE_SYMS[] = { 1, MSSYM_B2QQE170MovePlayerPacketB2AAA4QEAAB1AE10AEAVPlayerB2AAE14W4PositionModeB1AA11B1AA2HHB1AA1Z,
+	(VA)_CS_ONMOVE };
 
 // 玩家攻击监听
 static bool _CS_ONATTACK(Player* pPlayer, Actor* pa) {
@@ -2197,8 +2204,8 @@ static bool _CS_ONATTACK(Player* pPlayer, Actor* pa) {
 	de.releaseAll();
 	return ret;
 }
-static VA ONATTACK_SYMS[] = {1, MSSYM_B1QA6attackB1AA6PlayerB2AAA4UEAAB1UE10NAEAVActorB3AAAA1Z,
-	(VA)_CS_ONATTACK};
+static VA ONATTACK_SYMS[] = { 1, MSSYM_B1QA6attackB1AA6PlayerB2AAA4UEAAB1UE10NAEAVActorB3AAAA1Z,
+	(VA)_CS_ONATTACK };
 
 // 全图范围爆炸监听
 static void _CS_ONLEVELEXPLODE(VA _this, BlockSource* a2, Actor* a3, Vec3* a4, float a5, bool a6, bool a7, float a8, bool a9) {
@@ -2231,7 +2238,7 @@ static void _CS_ONLEVELEXPLODE(VA _this, BlockSource* a2, Actor* a3, Vec3* a4, f
 	de.releaseAll();
 }
 // 重生锚爆炸监听
-static bool _CS_SETRESPWNEXPLOREDE(Player* pPlayer, BlockPos* a2, BlockSource* a3, Level* a4) { // IDA
+static bool _CS_SETRESPWNEXPLOREDE(Player* pPlayer, BlockPos* a2, BlockSource* a3, Level* a4) {
 	auto original = (bool(*)(Player*, BlockPos*, BlockSource*, Level*)) * getOriginalData(_CS_SETRESPWNEXPLOREDE);
 	auto v8 = a3->getBlock(a2);
 	if (SYMCALL(int, MSSYM_B3QQDA8getStateB1AA1HB1AA5BlockB2AAE18QEBAHAEBVItemStateB3AAAA1Z,
@@ -2241,9 +2248,9 @@ static bool _CS_SETRESPWNEXPLOREDE(Player* pPlayer, BlockPos* a2, BlockSource* a
 	}
 	struct VA_tmp { VA v; };
 	if (a3->getDimensionId() != 1) {
-		if (!*(char*)(*((VA*)pPlayer + 107) + 7736)) {
+		if (!*(char*)(*((VA*)pPlayer + 107) + 7752)) {  //  IDA  RespawnAnchorBlock::explode   L31    else if ( !*(_BYTE *)(*((_QWORD *)this + ***) + ****) )
 			float pw = SYM_OBJECT(float, MSSYM_B2UUA4realB1AA840a00000);
-			if (!*(char*)&(((VA_tmp*)a4)[967].v)) {
+			if (!*(char*)&(((VA_tmp*)a4)[969].v)) {   // IDA  L94  if ( !LOBYTE(a4[***].lpVtbl) )
 				if (pw != 0.0) {
 					std::string blkname = v8->getLegacyBlock()->getFullName();
 					Events e;
@@ -2277,7 +2284,7 @@ static bool _CS_SETRESPWNEXPLOREDE(Player* pPlayer, BlockPos* a2, BlockSource* a
 }
 static VA ONLEVELEXPLODE_SYMS[] = { 2, MSSYM_B1QA7explodeB1AA5LevelB2AAE20QEAAXAEAVBlockSourceB2AAA9PEAVActorB2AAA8AEBVVec3B2AAA1MB1UA4N3M3B1AA1Z,
 	(VA)_CS_ONLEVELEXPLODE,
-	MSSYM_B1QE11trySetSpawnB1AE18RespawnAnchorBlockB2AAA2CAB1UE11NAEAVPlayerB2AAE12AEBVBlockPosB2AAE15AEAVBlockSourceB2AAA9AEAVLevelB3AAAA1Z,
+	MSSYM_B1QA7explodeB1AE18RespawnAnchorBlockB2AAE13CAXAEAVPlayerB2AAE12AEBVBlockPosB2AAE15AEAVBlockSourceB2AAA9AEAVLevelB3AAAA1Z,
 	(VA)_CS_SETRESPWNEXPLOREDE };
 
 // 玩家切换护甲
@@ -2558,6 +2565,32 @@ static bool _CS_ONPICKUPITEM(Player* pPlayer, ItemActor* itemactor, int a3, unsi
 static VA ONPICKUPITEM_SYMS[] = { 1, MSSYM_B1QA4takeB1AA6PlayerB2AAA4QEAAB1UE10NAEAVActorB2AAA2HHB1AA1Z,
 	(VA)_CS_ONPICKUPITEM };
 
+
+// 生物被扣血
+static void _CS_ONMOBHURT(Mob* _this, void* dmsg, int a3, unsigned __int8 a4, bool a5) {
+
+	Events e;
+	std::cout << "On Mob Hurt " << " a3: " << a3 << "  a4: " << a4 << "  a5:" << a5 << std::endl;
+	e.type = EventType::onMobHurt;
+	e.mode = ActMode::BEFORE;
+	e.result = 0;
+	MobDieEvent de;
+	getDamageInfo(_this, dmsg, &de);
+	de.pmob = _this;
+	e.data = &de;
+	bool ret = runCscode(ActEvent.ONMOBHURT, ActMode::BEFORE, e);
+	if (ret) {
+		auto original = (void(*)(Mob*, void*, int a3, unsigned __int8, bool)) * getOriginalData(_CS_ONMOBHURT);
+		original(_this, dmsg, a3, a4, a5);
+		e.result = ret;
+		e.mode = ActMode::AFTER;
+		runCscode(ActEvent.ONMOBHURT, ActMode::AFTER, e);
+	}
+	de.releaseAll();
+}
+static VA ONMOBHURT_SYMS[] = { 1, MSSYM_B2QUA4hurtB1AA5ActorB2AAA4MEAAB1UE22NAEBVActorDamageSourceB2AAA1HB1UA2N1B1AA1Z,
+	(VA)_CS_ONMOBHURT };
+
 #endif
 
 #if MODULE_05007
@@ -2571,12 +2604,12 @@ static void _CS_ONSCORECHANGED(Scoreboard* class_this, ScoreboardId* a2, Objecti
 	autoByteCpy(&pe.objectivename, a3->getscorename().c_str());
 	autoByteCpy(&pe.displayname, a3->getscoredisplayname().c_str());
 	pe.scoreboardid = a2->getId();
-	VA sc[2]{0};
+	VA sc[2]{ 0 };
 	pe.score = a3->getscoreinfo((ScoreInfo*)sc, a2)->getcount();
 	e.data = &pe;
 	bool ret = runCscode(ActEvent.ONSCORECHANGED, ActMode::BEFORE, e);
 	if (ret) {
-		auto original = (void(*)(Scoreboard*, ScoreboardId *, Objective *)) * getOriginalData(_CS_ONSCORECHANGED);
+		auto original = (void(*)(Scoreboard*, ScoreboardId*, Objective*)) * getOriginalData(_CS_ONSCORECHANGED);
 		original(class_this, a2, a3);
 		e.result = ret;
 		e.mode = ActMode::AFTER;
@@ -2684,7 +2717,7 @@ static VA ONSCOREBOARDINIT_SYMS[] = { 1, MSSYM_B2QQE170ServerScoreboardB2AAA4QEA
 	(VA)_CS_ONSCOREBOARDINIT };
 
 // 初始化各类hook的事件绑定，基于构造函数
-static struct EventSymsInit{
+static struct EventSymsInit {
 public:
 	EventSymsInit() {
 		sListens[ActEvent.ONSERVERCMD] = ONSERVERCMD_SYMS;
@@ -2725,8 +2758,8 @@ public:
 		sListens[ActEvent.ONSCRIPTENGINELOG] = ONSCRIPTENGINELOG_SYMS;
 		sListens[ActEvent.ONSCRIPTENGINECMD] = ONSCRIPTENGINECMD_SYMS;
 		sListens[ActEvent.ONSCOREBOARDINIT] = ONSCOREBOARDINIT_SYMS;
+		isListened[ActEvent.ONMOBHURT] = ONMOBHURT_SYMS;
 #if (COMMERCIAL)
-		isListened[ActEvent.ONMOBHURT] = true;
 		isListened[ActEvent.ONBLOCKCMD] = true;
 		isListened[ActEvent.ONNPCCMD] = true;
 		isListened[ActEvent.ONCOMMANDBLOCKUPDATE] = true;

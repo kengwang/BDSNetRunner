@@ -22,12 +22,12 @@ public:
 
 struct BlockLegacy {
 	// 获取方块名
-	auto getFullName() const {				// IDA BlockLegacy::~BlockLegacy
-		return (std::string&) * (__int64*)((__int64)this + 120);
+	auto getFullName() const {				// IDA BlockLegacy::~BlockLegacy  L61  此处小心追码  不建议改码
+		return (std::string&) * (__int64*)((__int64)this + 128);
 	}
 	// 获取方块ID号
-	auto getBlockItemID() const {			// IDA BlockLegacy::BlockLegacy VanillaItems::serverInitCreativeItemsCallback Item::beginCreativeGroup "itemGroup.name.planks"
-		short v3 = *(short*)((VA)this + 312);
+	auto getBlockItemID() const {			// NOT FOUND IDA VanillaItems::serverInitCreativeItemsCallback Item::beginCreativeGroup "itemGroup.name.planks"
+		short v3 = *(short*)((VA)this + 328); // IDA BlockLegacy::BlockLegacy L127    *(_WORD *)(a1 + ***) = a3;
 		if (v3 < 0x100) {
 			return v3;
 		}
@@ -77,8 +77,8 @@ struct BlockActor {
 		return *reinterpret_cast<Block**>(reinterpret_cast<VA>(this) + 16);
 	}
 	// 取方块位置
-	BlockPos* getPosition() {				// IDA BlockActor::BlockActor
-		return reinterpret_cast<BlockPos*>(reinterpret_cast<VA>(this) + 44);
+	BlockPos* getPosition() {				// IDA BlockActor::BlockActor:40    *(_DWORD *)(a1 + ***) = a2;
+		return reinterpret_cast<BlockPos*>(reinterpret_cast<VA>(this) + 84);
 	}
 };
 
@@ -90,8 +90,8 @@ struct BlockSource {
 			this, blkpos);
 	}
 	// 获取方块所处维度
-	int getDimensionId() {					// IDA Dimension::onBlockChanged
-		return *(int*)(*((VA*)this + 4) + 200);
+	int getDimensionId() {					// IDA Dimension::onBlockChanged	L30 : if ( *(_DWORD *)(*((_QWORD *)a2 + ***) + ***)
+		return *(int*)(*((VA*)this + 4) + 208);
 	}
 	// 获取指定范围内所有实体
 	std::vector<VA*>* getEntities(VA *rect) {
@@ -112,8 +112,12 @@ struct BlockSource {
 
 struct Dimension {
 	// 获取方块源
-	VA getBlockSource() {					// IDA Level::tickEntities
-		return *((VA*)this + 10);
+	VA getBlockSource() {					
+		/* IDA Level::tickEntities   
+		119 : v14 = j->GetTypeInfoCount;
+		120 : v15 = (struct BlockSource*)*((_QWORD*)v14 + **);
+		*/
+		return *((VA*)this + 11);
 	}
 };
 
@@ -258,7 +262,7 @@ struct Actor {
 #pragma endregion
 
 	// 取方块源
-	BlockSource* getRegion() {						// IDA
+	BlockSource* getRegion() {						// IDA GameMode::destroyBlock   L40:  v4 = *(BlockSource **)(*((_QWORD *)this + 1) + ***);    //关键寻找 BlockSource
 		return (BlockSource*)*((VA*)this + 105);
 	}
 
@@ -279,7 +283,7 @@ struct Actor {
 	}
 
 	// 是否悬空
-	const BYTE isStand() {				// IDA MovePlayerPacket::MovePlayerPacket
+	const BYTE isStand() {				// IDA MovePlayerPacket::MovePlayerPacket(Player &,Vec3 const &)   L26 : *((_BYTE *)this + 73) = *((_BYTE *)a2 + ***);    //此符号可能之后就会丢了,因为真的没什么关键特征
 		return *reinterpret_cast<BYTE*>(reinterpret_cast<VA>(this) + 448);
 	}
 
@@ -330,16 +334,16 @@ struct Actor {
 
 struct Mob : Actor {
 	// 获取装备容器
-	VA getArmor() {					// IDA Mob::addAdditionalSaveData
-		return VA(this) + 1472;
+	VA getArmor() {					// IDA Mob::getItemSlot  L7  return (__int64 *)(*(__int64 (__fastcall **)(_QWORD))(**(_QWORD **)(a1 + ***** ) + 这个不管))
+		return VA(this) + 1512;
 	}
 	// 获取手头容器
 	VA getHands() {
-		return VA(this) + 1480;		// IDA Mob::readAdditionalSaveData
+		return VA(this) + 1520;		// IDA Mob::getItemSlot  L4   return (__int64 *)(*(__int64 (__fastcall **)(_QWORD))(**(_QWORD **)(a1 + *****) + 这个不管))
 	}
 	// 获取地图信息
-	VA getLevel() {					// IDA Mob::die
-		return *((VA*)((VA)this + 856));
+	VA getLevel() {					// IDA Mob::die  L181   Level::broadcastActorEvent(*((_QWORD *)this + ***), this, v15);
+		return *((VA*)((VA)this + 107));
 	}
 };
 struct Player : Mob {
@@ -363,14 +367,14 @@ struct Player : Mob {
 #pragma endregion
 
 	// 取uuid
-	MCUUID* getUuid() {				// IDA ServerNetworkHandler::_createNewPlayer
-		return (MCUUID*)((char*)this + 2800);
+	MCUUID* getUuid() {				// IDA ServerNetworkHandler::_createNewPlayer  : 201       v21 = mce::UUID::asString(v18 + ****, v92);
+		return (MCUUID*)((char*)this + 2824);
 	}
 
 	// 根据地图信息获取玩家xuid
 	std::string& getXuid(VA level) {
 		return SYMCALL(std::string&, MSSYM_MD5_337bfad553c289ba4656ac43dcb60748,
-			level, (char*)this + 2800);
+			level, (char*)this + 2824);  // IDA 详见 getUuid
 	}
 
 	// 重设服务器玩家名
@@ -381,11 +385,11 @@ struct Player : Mob {
 
 	// 获取网络标识符
 	VA getNetId() {
-		return (VA)this + 2512;		// IDA ServerPlayer::setPermissions
+		return (VA)this + 2356;		// IDA ServerPlayer::setPermissions : 24    a1 + ****,
 	}
 	// 获取背包
-	VA getSupplies() {				// IDA Player::add
-		return *(VA*)(*((VA*)this + 378) + 176);
+	VA getSupplies() {				// IDA Player::add : 4   *(_QWORD *)(*((_QWORD *)this + ***) + ***),
+		return *(VA*)(*((VA*)this + 381) + 176);
 	}
 
 	// 添加一个物品
@@ -395,7 +399,7 @@ struct Player : Mob {
 
 	// 更新所有物品列表
 	void updateInventory() {
-		VA itm = (VA)this + 4568;				// IDA Player::drop
+		VA itm = (VA)this + 4592;				// IDA Player::drop 59 : InventoryTransactionManager::addAction((Player *)((char *)this + ****), (const struct InventoryAction *)&v19, 0);
 		SYMCALL(VA, MSSYM_B1QE23forceBalanceTransactionB1AE27InventoryTransactionManagerB2AAA7QEAAXXZ, itm);
 	}
 	// 发送数据包
@@ -470,7 +474,7 @@ struct ItemStack : ItemStackBase {
 		return str;
 	}
 	// 取容器内数量
-	int getStackSize() {			// IDA ContainerModel::networkUpdateItem
+	int getStackSize() {			// IDA ContainerModel::networkUpdateItem  L32    if ( !ItemStackBase::matchesItem(v10, a4) || *((_BYTE *)v10 + 34) != *((_BYTE *)a4 + ****)
 		return *((char*)this + 34);
 	}
 	// 判断是否空容器
@@ -483,8 +487,8 @@ struct ItemStack : ItemStackBase {
 
 struct ItemActor : Actor {
 	// 获取实际物品
-	ItemStack* getItemStack() {		// IDA   see Hopper::_addItem
-		return (ItemStack*)((VA)this + 1648);
+	ItemStack* getItemStack() {		// IDA   Hopper::_addItem  :  9    v6 = (struct ItemActor *)((char *)a3 + ****);
+		return (ItemStack*)((VA)this + 1672);
 	}
 };
 
@@ -502,7 +506,7 @@ struct LevelContainerModel {
 struct TextPacket {
 	char filler[0xC8];
 	// 取输入文本
-	std::string toString() {			// IDA ServerNetworkHandler::handle
+	std::string toString() {			// IDA  ServerNetworkHandler::handle(NetworkIdentifier const &,TextPacket const &): 11        v6 = (_BYTE **)((char *)a3 + **);
 		std::string str = std::string(*(std::string*)((VA)this + 80));
 		return str;
 	}
@@ -511,7 +515,7 @@ struct TextPacket {
 struct CommandRequestPacket {
 	char filler[0x90];
 	// 取命令文本
-	std::string toString() {			// IDA ServerNetworkHandler::handle
+	std::string toString() {			// IDA ServerNetworkHandler::handle(NetworkIdentifier const &,CommandRequestPacket const &)   :   47         v7 = CommandContext::CommandContext(v9, (char *)a3 + ***, &v17, v6);  
 		std::string str = std::string(*(std::string*)((VA)this + 40));
 		return str;
 	}

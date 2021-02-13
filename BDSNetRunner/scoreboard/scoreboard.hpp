@@ -45,7 +45,7 @@ struct Objective {
 		return SYMCALL(ScoreInfo*, MSSYM_B1QE14getPlayerScoreB1AA9ObjectiveB2AAA4QEBAB1QE11AUScoreInfoB2AAE16AEBUScoreboardIdB3AAAA1Z, this, a1, a2);
 	}
 	//获取计分板名称
-	auto getscorename() {		// IDA Objective::Objective
+	auto getscorename() {		// IDA Objective::Objective L17   std::string::string((void *)(a1 + **), a2);
 		return *(std::string*)((VA)this + 64);
 	}
 	//获取计分板展示名称

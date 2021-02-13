@@ -86,8 +86,8 @@ struct ACTEVENT {
 	const std::string ONSCRIPTENGINELOG = u8"onScriptEngineLog";
 	const std::string ONSCRIPTENGINECMD = u8"onScriptEngineCmd";
 	const std::string ONSCOREBOARDINIT = u8"onScoreboardInit";
-#if (COMMERCIAL)
 	const std::string ONMOBHURT = u8"onMobHurt";
+#if (COMMERCIAL)
 	const std::string ONBLOCKCMD = u8"onBlockCmd";
 	const std::string ONNPCCMD = u8"onNpcCmd";
 	const std::string ONCOMMANDBLOCKUPDATE = u8"onCommandBlockUpdate";

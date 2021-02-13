@@ -287,7 +287,7 @@ enum class ActorDamageCause : int {
 };
 
 struct ActorDamageByActorSource {
-	char fill[0x50];		// IDA ActorDamageByActorSource::clone
+	char fill[0x50];		// IDA ActorDamageByActorSource::clone  : 11    v6 = operator new(****);
 };
 
 // 各类组件获取和设置关键字
